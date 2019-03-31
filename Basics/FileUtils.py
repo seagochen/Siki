@@ -8,8 +8,15 @@ import ntpath
 
 from Basics.Exceptions import NoAvailableResourcesFoundException
 
+def gen_folder(strPrev, *strLast):
+    import os
+    strDir = strPrev
+    for strL in strLast:
+        strDir = os.path.join(strDir, strL)
+    return strDir
 
-def gen_path(strFolder, strFilename, strSuffix, strAddition=None):
+
+def gen_file(strFolder, strFilename, strSuffix, strAddition=None):
     import os
     strDir = os.path.join(strFolder, gen_filename(strFilename, strSuffix, strAddition))
     return os.path.abspath(strDir)
