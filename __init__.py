@@ -1,4 +1,6 @@
 import sys, os
 
+name = "siki"
+
 # append modules
-sys.path.append(os.path.abspath('./Polygon'))
+#sys.path.append(os.path.abspath('./Polygon'))

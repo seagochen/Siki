@@ -84,4 +84,12 @@ def check_datetime(datetime):
     """
     pattern = r"^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01]) (2[0-3]|[01]?[0-9]):([0-5]?[0-9]):([0-5]?[0-9])$"
     return re.match(pattern, datetime) is not None
+    
+    
+def check_ipv4(ip):
+    """
+    check the format of IPv4
+    """
+    pattern = r"^((?:(?:25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))\.){3}(?:25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d))))$"
+    return re.match(pattern, ip) is not None
    
