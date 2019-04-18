@@ -8,7 +8,7 @@ import ntpath
 
 from siki.basics.Exceptions import NoAvailableResourcesFoundException
 
-def gen_folder(strPrev, *strLast):
+def gen_folderpath(strPrev, *strLast):
     import os
     strDir = strPrev
     for strL in strLast:
@@ -16,17 +16,21 @@ def gen_folder(strPrev, *strLast):
     return strDir
 
 
-def gen_file(strFolder, strFilename, strSuffix, strAddition=None):
+def gen_filepath(strFolder, strFilename, strSuffix=None, strAddition=None):
     import os
     strDir = os.path.join(strFolder, gen_filename(strFilename, strSuffix, strAddition))
     return os.path.abspath(strDir)
 
 
-def gen_filename(strFilename, strSuffix, strAddition=None):
-    if strAddition is None:
+def gen_filename(strFilename, strSuffix=None, strAddition=None):
+    if strSuffix is None and strAddition is not None:
+        return strFilename + "." + strAddition
+    if strSuffix is None and strAddition is None:
+        return strFilename
+    if strSuffix is not None and strAddition is None:
         return strFilename + "." + strSuffix
-    else:
-        return strFilename + "." + strAddition + "." + strSuffix
+    
+    return strFilename + "." + strAddition + "." + strSuffix
 
 
 def read_file(strFilepath, nReadSize = 4096, callback_func=None):
