@@ -5,12 +5,12 @@
 
 from enum import Enum
 
-from Basics import FileUtils as fileutil
-from Basics import SystemUtils as sysutil
-from Basics import Convert as convert
-from Basics import TimeTicker as timetick
-from Basics import Hashcode as hashcode
-from Basics.Exceptions import NullPointerException, InvalidParamException
+from siki.basics import FileUtils as fileutil
+from siki.basics import SystemUtils as sysutil
+from siki.basics import Convert as convert
+from siki.basics import TimeTicker as timetick
+from siki.basics import Hashcode as hashcode
+from siki.basics.Exceptions import NullPointerException, InvalidParamException
 
 
 m_bStdOut = False

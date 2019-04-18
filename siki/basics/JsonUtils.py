@@ -6,8 +6,8 @@
 # Import system standard modules
 import json
 
-from Basics import FileUtils as fileutil
-from Basics import Convert as convert
+from siki.basics import FileUtils as fileutil
+from siki.basics import Convert as convert
 
 def parse_json_str(string):
     """

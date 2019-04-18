@@ -5,10 +5,10 @@
 
 import redis
 
-from Basics import Logger as logger
-from Basics.Logger import Priority as p
-from Basics import Exceptions as excepts
-from DataStructs.Queue import Queue
+from siki.basics import Logger as logger
+from siki.basics.Logger import Priority as p
+from siki.basics import Exceptions as excepts
+from siki.dstruct.Queue import Queue
 
 
 class PyRedisPool(object):

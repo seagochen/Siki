@@ -3,7 +3,7 @@
 # Create: Sep 16, 2018
 # Modifi: Sep 16, 2018
 
-import Basics.Exceptions as excepts
+import siki.basics.Exceptions as excepts
 
 class Queue:
 

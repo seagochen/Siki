@@ -4,8 +4,8 @@
 # Modifi: Oct 02, 2018
 
 import pymysql
-from Basics.Exceptions import *
-from Basics import ParametersCheck as paramc
+from siki.basics.Exceptions import *
+from siki.basics import ParametersCheck as paramc
 
 
 

@@ -5,8 +5,8 @@
 
 import re
 
-from PySQL import PySQLConnection as pys
-from Basics import Exceptions as excepts
+from siki.pysql import PySQLConnection as pys
+from siki.basics import Exceptions as excepts
 
 STR_SQL = ""
 

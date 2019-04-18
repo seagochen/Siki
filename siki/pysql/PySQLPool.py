@@ -3,11 +3,11 @@
 # Create: Sep 15, 2018
 # Modifi: Sep 30, 2018
 
-from PySQL import PySQLConnection as pys
-from Basics import Logger as logger
-from Basics.Logger import Priority as p
-from Basics import Exceptions as excepts
-from DataStructs.Queue import Queue
+from siki.pysql import PySQLConnection as pys
+from siki.basics import Logger as logger
+from siki.basics.Logger import Priority as p
+from siki.basics import Exceptions as excepts
+from siki.dstructs.Queue import Queue
 
 
 class PySQLPool(object):

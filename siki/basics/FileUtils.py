@@ -6,7 +6,7 @@
 import re
 import ntpath
 
-from Basics.Exceptions import NoAvailableResourcesFoundException
+from siki.basics.Exceptions import NoAvailableResourcesFoundException
 
 def gen_folder(strPrev, *strLast):
     import os
@@ -100,6 +100,14 @@ def search_folders(strFolderPath):
     return lDirs
 
 
+def root_leaf(path):
+    """
+    return root, leaf
+    """
+    head, tail = ntpath.split(path)
+    return ntpath.basename(head), tail
+
+
 def _file_ite(strFolderPath):
     import os
 
@@ -113,17 +121,12 @@ def _file_ite(strFolderPath):
     return flist
     
 
-def _file_filtering(lFiles, pattern):
+def _file_filtering(lfs, pattern):
     l = []
     if "*" == pattern:
-        l.extend(lFiles)
+        l.extend(lfs)
     else:
-        for f in lFiles:
-            if re.search(pattern, path_leaf(f)):
+        for f in lfs:
+            if re.search(pattern, f):
                 l.append(f)
     return l
-
-
-def path_leaf(path):
-    head, tail = ntpath.split(path)
-    return tail or ntpath.basename(head)
