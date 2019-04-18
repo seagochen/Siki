@@ -39,5 +39,5 @@ def is_windows():
 def is_linux():
     return 'Linux' == platform.system()
 
-def is_mac():
+def is_darwin():
     return 'Darwin' == platform.system()
