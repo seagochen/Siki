@@ -7,6 +7,7 @@ import re
 import ntpath
 
 from siki.basics.Exceptions import NoAvailableResourcesFoundException
+from siki.basics.Exceptions import InvalidParamException
 
 def gen_folderpath(strPrev, *strLast):
     import os
@@ -85,6 +86,34 @@ def rmdir(strFolder):
     if not os.path.exists(strFolder):
         raise NoAvailableResourcesFoundException("Directory path is not existed!")
     os.rmdir(strFolder)
+
+
+def isfile(path):
+    import os
+    return os.path.isfile(path)
+
+
+def isdir(path):
+    import os
+    return os.path.isdir(path)
+
+def exists(path):
+    import os
+    return os.path.lexists(path)
+
+def move(path1, path2):
+    import os
+    from shutil import move
+    # no file src exists
+    if exists(path1):
+        move(path1, path2)
+
+def copy(path1, path2): # just trying to copy file
+    from shutil import copy2, copytree
+    if exists(path1) and isfile(path1):
+        copy2(path1, path2)
+    if exists(path1) and isdir(path1):
+        copytree(path1, path2)
 
 
 def search_files(strFolderPath, pattern="*"):
