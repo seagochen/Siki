@@ -1,8 +1,12 @@
+#!/bin/env python3
+"""
+This file provides extension methods of FileNodeTree
+"""
+
 from siki.basics import FileUtils as fu
 from siki.basics import SystemUtils as su
 from siki.basics import Exceptions as excepts
-from siki.dstruct.FileNodeTree import FileNodeTree
-
+from FileNodeTree import FileNodeTree
 
 def _convert_path(path):
     if not fu.exists(path):
@@ -16,7 +20,7 @@ def _convert_path(path):
 
 def _merge_to_tree(f_tokens, main_tree):
     if len(f_tokens) <= 0:
-        pass # do nothing
+        return None # do nothing
 
     tree = None
     for token in f_tokens:
@@ -52,8 +56,7 @@ def traversal_dir(path, pattern="*"):
     files = fu.search_files(path, pattern)
 
     if len(files) <= 0:
-        print("no file found")
-        pass
+        return None # do nothing
 
     # file tree
     tree = FileNodeTree(_convert_path(path)[0])
@@ -63,6 +66,43 @@ def traversal_dir(path, pattern="*"):
         _merge_to_tree(_convert_path(f), tree)
 
     return tree
+
+
+def generate_list(tree):
+    """
+    generate a list from tree
+    """
+    #pattern = re.compile(pattern)
+    pathes = []
+    
+    if len(tree.leaves) > 0: # has children
+        for leaf in tree.leaves:
+            if len(leaf.leaves) <= 0:
+                pathes.append(leaf.generate_path())
+            else:
+                sub_pathes = generate_list(leaf)
+                pathes.extend(sub_pathes)
+    else:
+        pathes.append(tree.generate_path())
+    
+    return pathes
+
+
+def copy_tree(tree):
+
+    # create a main node with the same name of tree
+    mainTree = FileNodeTree(tree.name)
+
+    for leaf in tree.leaves:
+        if len(leaf.leaves) > 0:
+            subTree = copy_tree(leaf)
+            mainTree.append_node(subTree)
+        else:
+            subLeaf = FileNodeTree(leaf.name)
+            mainTree.append_node(subLeaf)
+    
+    return mainTree
+
 
 
 if __name__ == "__main__":
@@ -76,5 +116,3 @@ if __name__ == "__main__":
     files = tree.only_files()
     for f in files:
         print(f)
-    
-

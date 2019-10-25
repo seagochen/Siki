@@ -1,3 +1,9 @@
+#!/bin/env python3
+"""
+It will try to create a file structure consistent 
+with the source code structure to hold the required header files
+"""
+
 from siki.basics import FileUtils as fu
 from siki.basics import Exceptions as exceptions
 from siki.basics import SystemUtils as su
@@ -51,7 +57,7 @@ class FileNodeTree(object):
         if self.leaves_count() <= 0:
             return None
         
-        leaf = self.search_node(leafname)
+        leaf = self.search_name(leafname)
         if leaf is None:
             # for debug only
             print("nothing could be deleted")
@@ -72,9 +78,38 @@ class FileNodeTree(object):
             # now remove the node from root
             root.leaves.remove(leaf)
             return leaf
+    
+
+    def search_node(self, node, root=None):
+        """
+        search a leaf from root node, some kind of traversal
+        @param node: the node desired, FileNodeTree type
+        @param root: traversal from the root node, default is none
+        """
+
+        if root is None:
+            root = self
         
+        if root.leaves_count() <= 0:
+            return None
         
-    def search_node(self, leafname, root=None):
+        if self == node:
+            return self
+        
+        for leaf in root.leaves:
+            if leaf == node: # found the leaf
+                return leaf
+            
+            if leaf.leaves_count() > 0: # traversal the tree by deep search first
+                ret = leaf.search_node(node, leaf)
+                if ret is not None:
+                    return ret
+        
+        # nothing found
+        return None
+
+        
+    def search_name(self, leafname, root=None):
         """
         search a leaf from root node, some kind of traversal
         @param leafname: the leaf name, string type
@@ -95,7 +130,7 @@ class FileNodeTree(object):
                 return leaf
             
             if leaf.leaves_count() > 0: # traversal the tree by deep search first
-                ret = leaf.search_node(leafname, leaf)
+                ret = leaf.search_name(leafname, leaf)
                 if ret is not None:
                     return ret
         
@@ -165,7 +200,7 @@ class FileNodeTree(object):
         if ourTree.name != treeToMerge.name:
             if treeToMerge.name not in ourLeavesNames:
                 ourTree.append_node(treeToMerge) # append tree to our tree
-                pass
+                return ourTree
                 
         for subtree in treeToMerge.leaves:
             if subtree.name not in ourLeavesNames:
@@ -175,6 +210,8 @@ class FileNodeTree(object):
                 ourSubTree = ourTree.search_subnode(subtree.name)
                 if ourSubTree is not None:
                     ourSubTree.merge_subtree(treeToMerge, ourSubTree)
+
+        return ourTree
                     
                     
     def generate_path(self):
@@ -205,7 +242,7 @@ class FileNodeTree(object):
         return path
 
 
-    def only_files(self, root=None):
+    def only_files(self, nmode=False, root=None):
         """
         traversal and generate a list with files only    
         """
@@ -217,20 +254,26 @@ class FileNodeTree(object):
             for node in root.leaves:
                 path = node.generate_path()
                 if fu.isfile(path):
-                    flist.append(path)
+                    if nmode:
+                        flist.append(node)
+                    else:
+                        flist.append(path)
                 else:
-                    sub_flist = node.only_files(node)
+                    sub_flist = node.only_files(nmode, node)
                     if len(sub_flist) > 0:
                         flist.extend(sub_flist)
         else:
             path = self.generate_path()
             if fu.isfile(path):
-                flist.append(path)
+                if nmode:
+                    flist.append(self)
+                else:
+                    flist.append(path)
 
         return flist
 
     
-    def only_dirs(self, root=None):
+    def only_dirs(self, nmode=False, root=None):
         """
         traversal and generate a list with dirs only
         """
@@ -242,15 +285,21 @@ class FileNodeTree(object):
             for node in root.leaves:
                 path = node.generate_path()
                 if fu.isdir(path):
-                    dlist.append(path)
+                    if nmode:
+                        dlist.append(node)
+                    else:
+                        dlist.append(path)
                     if len(node.leaves) > 0:
-                        sub_dlist = node.only_dirs(node)
+                        sub_dlist = node.only_dirs(nmode, node)
                         if len(sub_dlist) > 0:
                             dlist.extend(sub_dlist)
         else:
             path = self.generate_path()
             if fu.isdir(path):
-                dlist.append(path)
+                if nmode:
+                    dlist.append(self)
+                else:
+                    dlist.append(path)
 
         return dlist
 
