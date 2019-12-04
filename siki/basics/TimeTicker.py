@@ -8,10 +8,6 @@ MS_PER_MINUTE = 60000
 MS_PER_HOUR = 3600000
 MS_PER_DAY = 86400000
 
-def tick_count():
-    import time
-    return time.time()
-
 def current_timestamp(strMessage = None):
     import datetime
     if strMessage is None:
