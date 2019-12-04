@@ -64,17 +64,26 @@ def write_file(strFilepath, rawData, bAppend=False):
 
 
 def touch_file(strFilepath):
+    """
+    Calling this method will create an empty file
+    """
     f = open(strFilepath, "w")
     f.close()
 
 
 def mkdir(strDirectory):
+    """
+    Calling this method will create an empty folder
+    """
     import os
     if not os.path.exists(strDirectory):
         os.makedirs(strDirectory)
 
 
 def rmfile(strFilepath):
+    """
+    Calling this method will delete a single file forcely
+    """
     import os
     if not os.path.exists(strFilepath):
         raise NoAvailableResourcesFoundException("File path is not existed!")
@@ -82,11 +91,13 @@ def rmfile(strFilepath):
 
 
 def rmdir(strFolder):
-    import os
+    """
+    Calling this method will delete the folder forcely
+    """
+    import os, shutil
     if not os.path.exists(strFolder):
         raise NoAvailableResourcesFoundException("Directory path is not existed!")
-    os.rmdir(strFolder)
-
+    shutil.rmtree(strFolder, ignore_errors=True)
 
 def isfile(path):
     import os

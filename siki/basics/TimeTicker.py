@@ -20,3 +20,6 @@ def current_timestamp(strMessage = None):
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
         return "{0} {1}".format(timestamp, strMessage)
 
+def time_since1970():
+    import time
+    return time.time()
