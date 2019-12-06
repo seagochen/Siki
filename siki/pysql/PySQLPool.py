@@ -7,7 +7,7 @@ from siki.pysql import PySQLConnection as pys
 from siki.basics import Logger as logger
 from siki.basics.Logger import Priority as p
 from siki.basics import Exceptions as excepts
-from siki.dstructs.Queue import Queue
+from siki.dstruct.Queue import Queue
 
 
 class PySQLPool(object):
