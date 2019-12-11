@@ -28,7 +28,8 @@ class Priority(Enum):
 def _gen_logfile(dir, file):
     import datetime
     timestamp = datetime.datetime.now().strftime("%Y%m%d")
-    return fileutil.gen_path(dir, file, "log", timestamp)
+    #return fileutil.gen_path(dir, file, "log", timestamp)
+    return fileutil.gen_filepath(dir, file, "log", timestamp)
 
 
 def init(b_stdout, b_log, dir = None, file = None):
