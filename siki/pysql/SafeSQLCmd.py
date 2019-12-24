@@ -42,7 +42,10 @@ def safe_insert(conn, db, table, item_id, **args):
 
     if conn is None:
         raise excepts.InvalidParamException("Conn cannot be null")
-    
+
+    # append item it 
+    args['id'] = item_id
+
     # generate a insert sql command
     keys = "`" + "`, `".join(args.keys()) + "`"
     values = "'" + "', '".join(args.values()) + "'"
