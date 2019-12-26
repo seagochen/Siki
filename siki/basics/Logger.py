@@ -94,7 +94,7 @@ def message(priority, title = None, msg = None, exception = None):
             errline += "{0}".format(error)
     
     if m_bUseLog:
-        fileutil.write_file(f, convert.convert_str2raw(errline), True)
+        fileutil.write_file(f, convert.string_to_binary(errline), True)
     if m_bStdOut:
         print(errline)
 
@@ -103,7 +103,7 @@ def _compute_base64(data):
     import base64
     from Basics import convert
     r = base64.b64encode(data.encode("UTF8"))
-    return convert.convert_raw2str(r)
+    return convert.binary_to_string(r)
 
 
 def data_in_base64(priority, title, data):
@@ -118,7 +118,7 @@ def data_in_base64(priority, title, data):
         line += "\n    Data: {0}\n".format(_compute_base64(data))
 
     if m_bUseLog:
-        fileutil.write_file(f, convert.convert_str2raw(line), True)
+        fileutil.write_file(f, convert.string_to_binary(line), True)
     if m_bStdOut:
         print(line)
 
@@ -135,6 +135,6 @@ def data_in_hashcode(priority, title, data):
         line += "\n    Data: {0}\n".format(hashcode.md5(data))
 
     if m_bUseLog:
-        fileutil.write_file(f, convert.convert_str2raw(line), True)
+        fileutil.write_file(f, convert.string_to_binary(line), True)
     if m_bStdOut:
         print(line)

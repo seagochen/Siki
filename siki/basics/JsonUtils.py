@@ -36,7 +36,7 @@ def load_json_file(filename):
     # load json file from given filename
     raw = fileutil.read_file(filename)
     if raw:
-        return parse_json_str(convert.convert_raw2str(raw))
+        return parse_json_str(convert.binary_to_string(raw))
     else:
         return {}
 
@@ -50,5 +50,5 @@ def write_json_file(dictionary, filename):
     ``filename`` (str), filename with path  
     """
     if len(dictionary) > 0:
-        raw = convert.convert_str2raw(json.dumps(dictionary))
+        raw = convert.string_to_binary(json.dumps(dictionary))
         fileutil.write_file(filename, raw)
