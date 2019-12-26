@@ -34,27 +34,26 @@ class PyRedisPool(object):
     def set_variable(self, key, val, secs=None, millisecs=None):
         try:
             redis.Redis(connection_pool=self.pool).set(key, val, secs, millisecs)
-        except e:
+        except Exception as e:
             logger.message(p.ERROR, msg="set variable failed", exception=e)
     
 
     def get_variable(self, key):
         try:
             return redis.Redis(connection_pool=self.pool).get(key)
-        except e:
+        except Exception as e:
             logger.message(p.ERROR, msg="get variable failed", exception=e)
-        
 
     
     def ping(self):
         try:
             return redis.Redis(connection_pool=self.pool).ping()
-        except e:
+        except Exception as e:
             logger.message(p.ERROR, msg="ping redis failed", exception=e)
 
     
     def get_keys(self, pattern="*"):
         try:
             return redis.Redis(connection_pool=self.pool).keys(pattern=pattern)
-        except e:
+        except Exception as e:
             logger.message(p.ERROR, msg="get keys failed", exception=e)

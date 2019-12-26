@@ -56,3 +56,7 @@ class SQLInjectionException(Exception):
 class SQLConnectionException(Exception):
     def __init__(self, message):
         super(SQLConnectionException, self).__init__(message)
+
+class RedisConnectionException(Exception):
+    def __init__(self, message):
+        super(RedisConnectionException, self).__init__(message)

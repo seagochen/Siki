@@ -194,7 +194,11 @@ def safe_query_tables(conn, db):
     STR_SQL = "SHOW TABLES IN `{}`".format(db)
     
     # executing sql
-    return pys.query(conn, STR_SQL)
+    rets = []
+    for i in pys.query(conn, STR_SQL): # obtaining a list
+        for k, v in i.items():
+            rets.append(v)
+    return rets
 
 
 
@@ -218,4 +222,4 @@ def safe_query_columns(conn, db, table):
     STR_SQL = "SHOW COLUMNS IN `{}`.`{}`".format(db, table)
     
     # executing sql
-    return pys.query(conn, STR_SQL)
+    return pys.query(conn, STR_SQL) # obtaining a list
