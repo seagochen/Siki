@@ -1,17 +1,19 @@
 # -*- coding: utf-8 -*-
 # Author: Nathan Sheffield
 # Modifi: Orlando Chen
-# Last: Sep 13, 2018
+# Last: Dec 27, 2019
 
 class AttributeDict(object):
-    """
-    A class to convert a nested Dictionary into an object with key-values
-    accessibly using attribute notation (AttributeDict.attribute) instead of
-    key notation (Dict["key"]). This class recursively sets Dicts to objects,
-    allowing you to recurse down nested dicts (like: AttributeDict.attr.attr)
-    """
-    def __init__(self, **entries):
-        self.add_entries(**entries)
+
+    def __init__(self, entries = None):
+        """
+        A class to convert a nested Dictionary into an object with key-values
+        accessibly using attribute notation (AttributeDict.attribute) instead of
+        key notation (Dict["key"]). This class recursively sets Dicts to objects,
+        allowing you to recurse down nested dicts (like: AttributeDict.attr.attr)
+        """
+        if type(entries) is dict:
+            self.add_entries(**entries)
 
 
     def add_entries(self, **entries):
@@ -22,7 +24,7 @@ class AttributeDict(object):
         """
         for key, value in entries.items():
             if type(value) is dict:
-                self.__dict__[key] = AttributeDict(**value)
+                self.__dict__[key] = AttributeDict(value)
             else:
                 self.__dict__[key] = value
     
@@ -36,7 +38,7 @@ class AttributeDict(object):
 
     def to_dict(self):
         """
-        transform attributed dict to dictionary type
+        transform attributed dictionary to python dictionary type
         """
         _dict = {}
         for key, value in self.__dict__.items():
@@ -47,15 +49,32 @@ class AttributeDict(object):
         return _dict
 
 
+    def from_dict(self, dictionary):
+        """
+        transform a python dictionary type to attributed dictionary type
+        """
+        if type(entries) is dict:
+            self.add_entries(**entries)
+
+
     def keys(self):
+        """
+        return the keys of dictionary
+        """
         return self.__dict__.keys()
 
 
     def values(self):
+        """
+        return the values of dictionary
+        """
         return self.__dict__.values()
 
 
     def items(self, *args, **kwargs):
+        """
+        return the key, value pairs of dictionary
+        """
         return self.__dict__.items(*args, **kwargs)
 
 
