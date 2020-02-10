@@ -62,7 +62,7 @@ class PySQLPool(object):
                 conn.connect()
             
             return conn
-        except e:
+        except Exception as e:
             logger.message(p.ERROR, msg="get connection failed", exception=e)
 
 
