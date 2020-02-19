@@ -74,7 +74,7 @@ class ApplyingXMLRules(object):
 
 
 
-    def decode(self, request_params):
+    def convert(self, request_params):
         """
         This module mainly used to reduce coupling code, especially transing variables between
         two different platforms or code. At present, the most important application is the network 
