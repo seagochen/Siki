@@ -3,7 +3,7 @@
 # Created: May 10, 2018
 # LastChg: Feb 19, 2020
 
-from siki.basic import Exceptions as excepts
+from siki.basics import Exceptions as excepts
 
 
 def intersection(setA, setB):

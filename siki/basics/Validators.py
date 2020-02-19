@@ -34,7 +34,7 @@ def check_float(num):
     regular for float number
     """
     pattern = r"^[0-9]+\.*[0-9]*$"
-    return re.match(pattern, value) is not None
+    return re.match(pattern, num) is not None
 
 
 def check_chn_characters(name):
