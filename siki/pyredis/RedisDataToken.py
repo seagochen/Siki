@@ -59,6 +59,7 @@ class RedisDataToken(object):
                 self.data = self.token["data"]
 
             # 4. return to caller
+            self.token = {"data":self.data, "type":self.dtype, "timestamp": self.timestamp}
             return self.token
 
         else:

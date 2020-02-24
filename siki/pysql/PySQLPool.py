@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Author: Orlando Chen
 # Create: Sep 15, 2018
-# Modifi: Sep 30, 2018
+# Modifi: Feb 24, 2020
 
 from siki.pysql import PySQLConnection as pys
 from siki.basics import Logger as logger
@@ -9,6 +9,7 @@ from siki.basics.Logger import Priority as p
 from siki.basics import Exceptions as excepts
 from siki.dstruct.Queue import Queue
 
+import threading
 
 class PySQLPool(object):
 
@@ -21,6 +22,7 @@ class PySQLPool(object):
         * [params] user, password, host, port, db, bstd, blog, dir, fname
         """
         self.pool = Queue()
+        self.lock = threading.Lock()
 
         if 'bstd' in params.keys() and 'blog' in params.keys() \
             and 'dir' in params.keys() and 'fname' in params.keys():
@@ -39,8 +41,11 @@ class PySQLPool(object):
             
             # print debug message
             logger.message(p.INFO, msg="creating connections pool finished")
+        
         except excepts.SQLConnectionException as e:
             logger.message(p.ERROR, msg="creating connection failed", exception=e)
+
+
 
 
     def get_connection(self):
@@ -50,6 +55,8 @@ class PySQLPool(object):
         * [conn] pymysql.connect, the connection object from pool
         """
         try:
+            self.lock.acquire()
+
             # returns a conn instance when one is available else 
             # waits until one is
             conn = None
@@ -62,8 +69,14 @@ class PySQLPool(object):
                 conn.connect()
             
             return conn
+        
         except Exception as e:
             logger.message(p.ERROR, msg="get connection failed", exception=e)
+        
+        finally:
+            self.lock.release()
+
+
 
 
     def put_connection(self, conn):
@@ -72,41 +85,74 @@ class PySQLPool(object):
         Args:
         * [conn] pymysql.connect
         """
-        if conn and pys.check_connection(conn):
-            return self.pool.enqueue(conn)
-        else:
-            logger.message(p.ERROR, msg="an empty connection wants to add to queue, skipped")
+        try:
+            self.lock.acquire()
+
+            if conn and pys.check_connection(conn):
+                return self.pool.enqueue(conn)
+            else:
+                logger.message(p.ERROR, msg="an empty connection wants to add to queue, skipped")
+
+        finally:
+            self.lock.release()
+
+
 
 
     def refresh(self):
         """
         Refresh the connection pool, this function will fix broken connections.
         """
-        backs = []
-        for conn in self.pool:
-            if conn and not pys.check_connection(conn):
-                backs.append(conn)
-        self.pool.merge(backs)
+        try:
+            self.lock.acquire()
 
+            backs = []
+            for conn in self.pool:
+                if conn and not pys.check_connection(conn):
+                    backs.append(conn)
+            self.pool.merge(backs)
 
+        finally:
+            self.lock.release()
     
+
+
+
     def is_empty(self):
         """
         Whether the pool is empty
         Returns:
         * [res] bool
         """
-        return self.pool.is_empty()
+        try:
+            self.lock.acquire()
+
+            return self.pool.is_empty()
+
+        finally:
+            self.lock.release()
+
+
 
 
     def close(self):
         """
         Close the connection pool, this function will release all resources
         """
-        logger.message(p.INFO, msg = "closing pool...")
-        while not self.is_empty():
-            pys.disconnect(self.pool.dequeue())
-        logger.message(p.INFO, msg = "PySQLPool colsed")
+        try:
+            self.lock.acquire()
+
+            logger.message(p.INFO, msg = "closing pool...")
+            
+            while not self.is_empty():
+                pys.disconnect(self.pool.dequeue())
+            
+            logger.message(p.INFO, msg = "PySQLPool colsed")
+        
+        finally:
+            self.lock.release()
+
+
     
 
     def size(self):
@@ -115,13 +161,9 @@ class PySQLPool(object):
         Returns:
         * [size] int, the size of contained connections
         """
-        return self.pool.size()
-
-    
-    def update_log(self, message):
-        """
-        Print out a message to console or log file, this depending on your setting of logger 
-        Args:
-        * [message] str
-        """
-        logger.message(p.INFO, msg = message)
+        try:
+            self.lock.acquire()
+            return self.pool.size()
+        finally:
+            self.lock.release()
+        
