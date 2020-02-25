@@ -35,7 +35,7 @@ def safe_insert(conn, db, table, args, debug=False):
     * [sql] str, command of sql
     """
     
-    res = _sql_args_check(db, table, item_id, args.keys(), args.values())
+    res = _sql_args_check(db, table, args.keys(), args.values())
     
     if res is False:
         raise excepts.SQLInjectionException(
