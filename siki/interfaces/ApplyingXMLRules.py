@@ -9,7 +9,7 @@ import xml.etree.ElementTree as etree
 from siki.basics import FileUtils as fu
 from siki.basics import Exceptions as excepts
 from siki.basics import Validators as valid
-import siki.interfaces import ParametersProcessor as proc
+from siki.interfaces import ParametersProcessor as proc
 
 from siki.dstruct import DictExtern
 

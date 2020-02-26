@@ -6,7 +6,7 @@
 
 from siki.dstruct import DictExtern as dictext
 from siki.basics import Exceptions as excepts
-import siki.interfaces import StringConverter as strconv
+from siki.interfaces import StringConverter as strconv
 
 
 def get_dictval_from_param(xmlnode, param):
