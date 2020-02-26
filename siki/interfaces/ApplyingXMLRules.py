@@ -9,7 +9,7 @@ import xml.etree.ElementTree as etree
 from siki.basics import FileUtils as fu
 from siki.basics import Exceptions as excepts
 from siki.basics import Validators as valid
-from siki.interfaces import ParametersProcessor as proc
+import siki.interfaces import ParametersProcessor as proc
 
 from siki.dstruct import DictExtern
 
@@ -69,7 +69,7 @@ class ApplyingXMLRules(object):
         if type(value) is not str:
             return False
 
-        pattern = u"^([\u4e00-\u9fa5]|[0-9a-zA-Z]|\s|-|:|\.|_|,|%)+$"
+        pattern = u"^([\u4e00-\u9fa5]|[0-9a-zA-Z]|\s|-|:|\.|_|,|\|)+$"
         if re.match(pattern, value) is None:
             return True
 
@@ -200,7 +200,7 @@ class ApplyingXMLRules(object):
 if __name__ == "__main__":
 
     roughly = {"wkey1":"thus", "wkey2":"", "wkey3":"None", "wkey4":"", "wkey5":"INSERT", 
-        "wkey6":"110", "wkey7":"1%2%3%4", "wkey8":"None"}
+        "wkey6":"110", "wkey7":"1234|57|214.14|test|测试数据||", "wkey8":"None"}
 
     """ parsing rule looks like:
         <config>

@@ -6,7 +6,7 @@
 
 from siki.dstruct import DictExtern as dictext
 from siki.basics import Exceptions as excepts
-from siki.interfaces import StringConverter as strconv
+import siki.interfaces import StringConverter as strconv
 
 
 def get_dictval_from_param(xmlnode, param):
@@ -79,7 +79,7 @@ def get_listval_from_param(xmlnode, key, val):
     # so the incoming list-str should be 1,2,3,4,5,6
     # if the v_type indicates they are numbers
 
-    tokens = val.split("%")
+    tokens = val.split("|")
 
     final_key = xmlnode["name"]
     final_val = []

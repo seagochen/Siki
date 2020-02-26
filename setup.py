@@ -8,7 +8,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="siki",
-    version="0.1.3.6",
+    version="0.1.3.8",
     author="Orlando Chen",
     author_email="seagochen@hotmail.com",
     description="A collection of tools that may be used to help users coding with Python in an easy way",
