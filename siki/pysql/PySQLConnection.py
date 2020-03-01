@@ -57,13 +57,8 @@ def check_connection(connection):
     Args:
     connection (connector)
     """
-    with connection.cursor() as cursor:
-        cursor.execute("SELECT version()")
-        result = cursor.fetchone()
-        if result:
-            return True
-        else:
-            return False
+    rows = execute(connection, "SELECT version()")
+    return rows is not None
 
 
 def execute(connection, statement):
