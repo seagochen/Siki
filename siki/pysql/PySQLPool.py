@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Author: Orlando Chen
 # Create: Sep 15, 2018
-# Modifi: Feb 24, 2020
+# Modifi: Mar 01, 2020
 
 from siki.pysql import PySQLConnection as pys
 from siki.basics import Logger as logger
@@ -10,20 +10,26 @@ from siki.basics import Exceptions as excepts
 from siki.dstruct.Queue import Queue
 
 import threading
+import time
 
-class PySQLPool(object):
+class PySQLPool(threading.Thread):
 
-    def __init__(self, size, **params):
+    def __init__(self, size: int, params: dict):
         """
         setting up a process pool for sql handling
+        
         Args:
         * [size] the number of sql connections to keep
-        * [config] the configuration file in json format to load
         * [params] user, password, host, port, db, bstd, blog, dir, fname
         """
         self.pool = Queue()
         self.lock = threading.Lock()
+        self.params = params
 
+        # init self threading
+        threading.Thread.__init__(self)
+
+        # init with configure file
         if 'bstd' in params.keys() and 'blog' in params.keys() \
             and 'dir' in params.keys() and 'fname' in params.keys():
             logger.init(bool(params['bstd']), bool(params['blog']), params['dir'], params['fname'])
@@ -33,8 +39,10 @@ class PySQLPool(object):
         try:
             for i in range(size):
                 # create a connection to sql server
-                conn = pys.connect(user=params['user'], password=params['password'],
-                    host=params['host'], port=params['port'])
+                conn = pys.connect(user=params['user'], 
+                    password=params['password'],
+                    host=params['host'], 
+                    port=params['port'])
 
                 # add connection to queue
                 self.pool.enqueue(conn)
@@ -48,33 +56,53 @@ class PySQLPool(object):
 
 
 
+
+        def run(self):
+            """
+            running in backside
+            """
+            while True:
+                # delay for 60 seconds
+                time.sleep(60) 
+
+                self.refresh()
+
+
+
+
     def get_connection(self):
         """
         Draw a connection from pool
         Returns:
         * [conn] pymysql.connect, the connection object from pool
         """
+        conn = None
         try:
             self.lock.acquire()
 
-            # returns a conn instance when one is available else 
-            # waits until one is
-            conn = None
+            # returns a conn instance
             if len(self.pool) > 0:
                 conn = self.pool.dequeue()
 
-            # checks if conn is still connected because conn instance 
-            # automatically closes when not in used
-            if conn and not pys.check_connection(conn):
-                conn.connect()
+            # connection is empty
+            if conn is None:
+                logger.message(p.INFO, msg="connection is none, create a new one")
+                conn = pys.connect(
+                    user=self.params['user'],
+                    password=self.params['password'],
+                    host=self.params['host'],
+                    port=self.params['port'])
             
-            return conn
-        
+            # if not connected
+            if not pys.check_connection(conn):
+                conn.connect()
+
         except Exception as e:
-            logger.message(p.ERROR, msg="get connection failed", exception=e)
+            logger.message(p.ERROR, msg="get connection failed, create a new one", exception=e)
         
         finally:
             self.lock.release()
+            return conn
 
 
 
@@ -88,10 +116,21 @@ class PySQLPool(object):
         try:
             self.lock.acquire()
 
+            # valid connection, put it back to pool
             if conn and pys.check_connection(conn):
-                return self.pool.enqueue(conn)
+                self.pool.enqueue(conn)
+            
+            # none connection, create a new one then re-enqueue
             else:
-                logger.message(p.ERROR, msg="an empty connection wants to add to queue, skipped")
+                conn = pys.connect(
+                    user=self.params['user'],
+                    password=self.params['password'],
+                    host=self.params['host'],
+                    port=self.params['port']) 
+                logger.message(p.INFO, msg="create a new connection to pool")
+
+                # enqueue
+                self.put_connection(conn)
 
         finally:
             self.lock.release()
@@ -108,8 +147,20 @@ class PySQLPool(object):
 
             backs = []
             for conn in self.pool:
-                if conn and not pys.check_connection(conn):
+
+                # an empty connection detected, reconnect to server
+                if conn is None:
+                    conn = pys.connect(
+                        user=self.params['user'],
+                        password=self.params['password'],
+                        host=self.params['host'],
+                        port=self.params['port']) 
+
+                # reconnect if lost connection to server
+                if not pys.check_connection(conn):
                     backs.append(conn)
+                
+            # after the loop, add new queue to original queue
             self.pool.merge(backs)
 
         finally:
