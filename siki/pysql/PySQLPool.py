@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Author: Orlando Chen
 # Create: Sep 15, 2018
-# Modifi: Mar 01, 2020
+# Modifi: Mar 10, 2020
 
 from siki.pysql import PySQLConnection as pys
 from siki.basics import Logger as logger
@@ -9,8 +9,9 @@ from siki.basics.Logger import Priority as p
 from siki.basics import Exceptions as excepts
 from siki.dstruct.Queue import Queue
 
-import threading
 import time
+import threading
+
 
 class PySQLPool(threading.Thread):
 
@@ -22,12 +23,12 @@ class PySQLPool(threading.Thread):
         * [size] the number of sql connections to keep
         * [params] user, password, host, port, db, bstd, blog, dir, fname
         """
+        threading.Thread.__init__(self)
+
+        # assgin values
         self.pool = Queue()
         self.lock = threading.Lock()
         self.params = params
-
-        # init self threading
-        threading.Thread.__init__(self)
 
         # init with configure file
         if 'bstd' in params.keys() and 'blog' in params.keys() \
@@ -55,17 +56,20 @@ class PySQLPool(threading.Thread):
 
 
 
+    
+    def run(self):
+        """
+        threading.Thread method, when start method called, this 
+        threading method will automatically run by self in every
+        60 seconds
+        """
+        while True:
+            # sleeping for 60 secs
+            time.sleep(60)
 
+            # refresh the pool
+            self.refresh()
 
-        def run(self):
-            """
-            running in backside
-            """
-            while True:
-                # delay for 60 seconds
-                time.sleep(60) 
-
-                self.refresh()
 
 
 
@@ -84,7 +88,7 @@ class PySQLPool(threading.Thread):
             if len(self.pool) > 0:
                 conn = self.pool.dequeue()
 
-            # connection is empty
+            # if connection is empty
             if conn is None:
                 logger.message(p.INFO, msg="connection is none, create a new one")
                 conn = pys.connect(
@@ -95,11 +99,11 @@ class PySQLPool(threading.Thread):
             
             # if not connected
             if not pys.check_connection(conn):
-                conn.connect()
+                pys.reconnect(conn)
 
         except Exception as e:
-            logger.message(p.ERROR, msg="get connection failed, create a new one", exception=e)
-        
+            logger.message(p.ERROR, msg="get connection failed", exception=e)
+
         finally:
             self.lock.release()
             return conn
@@ -135,37 +139,6 @@ class PySQLPool(threading.Thread):
         finally:
             self.lock.release()
 
-
-
-
-    def refresh(self):
-        """
-        Refresh the connection pool, this function will fix broken connections.
-        """
-        try:
-            self.lock.acquire()
-
-            backs = []
-            for conn in self.pool:
-
-                # an empty connection detected, reconnect to server
-                if conn is None:
-                    conn = pys.connect(
-                        user=self.params['user'],
-                        password=self.params['password'],
-                        host=self.params['host'],
-                        port=self.params['port']) 
-
-                # reconnect if lost connection to server
-                if not pys.check_connection(conn):
-                    backs.append(conn)
-                
-            # after the loop, add new queue to original queue
-            self.pool.merge(backs)
-
-        finally:
-            self.lock.release()
-    
 
 
 
@@ -215,6 +188,43 @@ class PySQLPool(threading.Thread):
         try:
             self.lock.acquire()
             return self.pool.size()
+
         finally:
             self.lock.release()
-        
+
+
+
+    def refresh(self):
+        """
+        Refresh the connection pool, this function will fix broken connections.
+        """
+        try:
+            self.lock.acquire()
+            backup = []
+
+            while not self.pool.is_empty(): 
+                conn = self.pool.dequeue() # dequeue from pool
+
+                # an empty connection detected, reconnect to server
+                if conn is None:
+                    conn = pys.connect(
+                        user=self.params['user'],
+                        password=self.params['password'],
+                        host=self.params['host'],
+                        port=self.params['port'])
+
+                # connection not works, reconnect to server
+                if not pys.check_connection(conn):
+                    pys.reconnect(conn)
+
+                # append connection to queue
+                backup.append(conn)
+
+            # after the loop, add new queue to original queue
+            self.pool.merge(backup)
+
+            # refreshing pool
+            logger.message(p.INFO, msg="connections: {}/{}, refresing pool finished...".format(len(backup), self.pool.size()))
+
+        finally:
+            self.lock.release()

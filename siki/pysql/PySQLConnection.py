@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Author: Orlando Chen
 # Create: May 08, 2018
-# Modifi: Oct 02, 2018
+# Modifi: Mar 10, 2018
 
 import pymysql
 from siki.basics.Exceptions import *
@@ -57,8 +57,11 @@ def check_connection(connection):
     Args:
     connection (connector)
     """
-    rows = execute(connection, "SELECT version()")
-    return rows is not None
+    try:
+        connection.ping(True)
+        return True
+    except:
+        return False
 
 
 def execute(connection, statement):
