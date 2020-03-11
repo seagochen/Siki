@@ -116,7 +116,7 @@ def binary_to_list(binary, sep=","):
 
 
 
-def detetime_to_str(date = None, format = "%Y-%m-%d %H:%M:%S"):
+def datetime_to_str(date = None, format = "%Y-%m-%d %H:%M:%S"):
     """
     this method will convert the datetime into string with the format YYYY-mm-dd HH:MM:SS
 

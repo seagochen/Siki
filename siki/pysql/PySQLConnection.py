@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Author: Orlando Chen
 # Create: May 08, 2018
-# Modifi: Mar 10, 2018
+# Modifi: Mar 11, 2020
 
 import pymysql
 from siki.basics.Exceptions import *
@@ -12,13 +12,15 @@ from siki.basics import ParametersCheck as paramc
 def connect(password, user="root", host="127.0.0.1", port=3306):
     """
     Create a connection to server
-    Args:
+    
+    @Args:
     * [host] host ip address, default is localhost
     * [user] user name for sql authorization, default is root
     * [password] user password for sql authorization
     * [port] connection port, default is 3306, not requried
-    Returns:
-    a connection to the database
+    
+    @Returns:
+    * 【connection] to the database
     """
     res, nullkeys = paramc.check_null_params(user=user, password=password, host=host, port=port)
     
@@ -38,8 +40,9 @@ def connect(password, user="root", host="127.0.0.1", port=3306):
 def disconnect(connection):
     """
     Disconnect to MySQL server
-    Args:
-    connection (connector)
+    
+    @Args:
+    * [connection] connection to disconnect to server
     """
     connection.close()
 
@@ -47,6 +50,9 @@ def disconnect(connection):
 def reconnect(connection):
     """
     Reconnect to server
+
+    @Args:
+    * [connection] connection to reconnect
     """
     connection.connect()
 
@@ -54,8 +60,12 @@ def reconnect(connection):
 def check_connection(connection):
     """
     Check a connection is available
-    Args:
-    connection (connector)
+    
+    @Args:
+    * [connection] if connection is alive return True
+
+    @Returns:
+    * [bool]
     """
     try:
         connection.ping(True)
@@ -67,9 +77,13 @@ def check_connection(connection):
 def execute(connection, statement):
     """
     execute sql command
-    Args:
-    connection (connector)
-    statement (str)
+    
+    @Args:
+    * [connection]
+    * [statement]
+
+    @Returns:
+    * [int] depends on how many rows are affected
     """
     with connection.cursor() as cursor:
         rows = cursor.execute(statement)
@@ -80,9 +94,13 @@ def execute(connection, statement):
 def query(connection, statement):
     """
     query sql command
-    Args:
-    connection (connector)
-    statement (str)
+    
+    @Args:
+    * [connection] connector
+    * [statement] str
+
+    @Returns:
+    * [any] could be None, dict, list, depending on how many rows returned
     """
     with connection.cursor() as cursor:
         rows = cursor.execute(statement)
@@ -91,19 +109,25 @@ def query(connection, statement):
             res = cursor.fetchall()
         if rows == 1:
             res = cursor.fetchone()
+        connection.commit()
         return res
 
 
 def multi_execute(connection, statement, varbs):
     """
     execute multi-commands
-    Args:
+
+    Usage:
+    multi_execute(conn, "insert into table (key1, key2, key3, ...) values (% % % %)"), varbs)
+    the 'varbs' is a list of [[val1, val2, val3, ...], [val1, val2, val3, ...]]
+
+    @Args:
     * [connection] pymysql.connection
     * [statement] str, template
     * [varbs] list
-    Usage:
-    multi_execute(conn, "insert into table (key1, key2, key3, ...) values (% % % %)"), varbs
-    is list of [[val1, val2, val3, ...], [val1, val2, val3, ...]]
+
+    @Returns:
+    * [int] depends on how many rows are affected
     """
     with connection.cursor() as cursor:
         rows = 0
