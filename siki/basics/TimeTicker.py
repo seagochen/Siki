@@ -1,14 +1,24 @@
 # -*- coding: utf-8 -*-
 # Author: Orlando Chen
-# Create: May 09, 2018
-# Modifi: May 09, 2018
+# Created: May 09, 2018
+# LastChg: Mar 11, 2020
 
 MS_PER_SECOND = 1000
 MS_PER_MINUTE = 60000
 MS_PER_HOUR = 3600000
 MS_PER_DAY = 86400000
 
-def current_timestamp(strMessage = None):
+def debug_msg_with_timestamp(strMessage = None):
+    """
+    return to caller a string message with timestamp for debug purpose
+
+    @Args:
+    * [strMessage] message to display, if none, the returning will just 
+        only a timestamp of the format YYYY-mm-dd HH:MM:SS.ms
+
+    @Returns:
+    * [str] returning a string with timestamp
+    """
     import datetime
     if strMessage is None:
         return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
@@ -16,6 +26,10 @@ def current_timestamp(strMessage = None):
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
         return "{0} {1}".format(timestamp, strMessage)
 
+
 def time_since1970():
+    """
+    Returning a decimal number with couting the last seconds since 1970
+    """
     import time
     return time.time()

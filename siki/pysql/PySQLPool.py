@@ -64,8 +64,8 @@ class PySQLPool(threading.Thread):
         60 seconds
         """
         while True:
-            # sleeping for 60 secs
-            time.sleep(60)
+            # sleeping for 30 minutes
+            time.sleep(60 * 30)
 
             # refresh the pool
             self.refresh()

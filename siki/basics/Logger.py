@@ -75,7 +75,7 @@ def message(priority, title = None, msg = None, exception = None):
     if m_bUseLog:
         f = _check_valid_file(m_dir, m_file)
 
-    errline = "{0} <{1}>".format(timetick.current_timestamp(), _priority_name(priority))
+    errline = "{0} <{1}>".format(timetick.debug_msg_with_timestamp(), _priority_name(priority))
     if title is not None:
         errline += "\t[{0}]".format(title)
     if msg is not None:
@@ -110,7 +110,7 @@ def data_in_base64(priority, title, data):
     global m_dir, m_file, m_bStdOut, m_bUseLog
     # check log is validate
     f = _check_valid_file(m_dir, m_file)
-    line = "{0} <{1}> [{2}]".format(timetick.current_timestamp(), _priority_name(priority), title)
+    line = "{0} <{1}> [{2}]".format(timetick.debug_msg_with_timestamp(), _priority_name(priority), title)
 
     if sysutil.is_windows():
         line += "\r\n    Data: {0}\r\n".format(_compute_base64(data))
@@ -127,7 +127,7 @@ def data_in_hashcode(priority, title, data):
     global m_dir, m_file, m_bStdOut, m_bUseLog
     # check log is validate
     f = _check_valid_file(m_dir, m_file)
-    line = "{0} <{1}> [{2}]".format(timetick.current_timestamp(), _priority_name(priority), title)
+    line = "{0} <{1}> [{2}]".format(timetick.debug_msg_with_timestamp(), _priority_name(priority), title)
 
     if sysutil.is_windows():
         line += "\r\n    Data: {0}\r\n".format(hashcode.md5(data))

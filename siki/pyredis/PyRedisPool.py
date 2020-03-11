@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Author: Orlando Chen
 # Created: Sep 20, 2018
-# LastChg: Feb 20, 2020
+# LastChg: Mar 11, 2020
 
 import redis
 
@@ -15,7 +15,7 @@ class PyRedisPool(object):
 
 
 
-    def __init__(self, **params):
+    def __init__(self, params: dict):
         """
         setting up a process pool for sql handling
         Args:
