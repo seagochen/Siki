@@ -30,6 +30,25 @@ def debug_msg_with_timestamp(strMessage = None):
 def time_since1970():
     """
     Returning a decimal number with couting the last seconds since 1970
+
+    @Returns:
+    * [float] 
     """
     import time
     return time.time()
+
+
+def time_now_foramt(format: str):
+    """
+    Returning a formatted string of time
+
+    @Args:
+    * [format] str, something like %Y-%m-%d %H:%M:%S.%f
+
+    @Returns:
+    * [str] the formatted string of time
+    """
+    import datetime
+    return datetime.datetime.now().strftime(format)
+
+
