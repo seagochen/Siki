@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 # Author: Orlando Chen
 # Created: Sep 20, 2018
-# LastChg: Mar 11, 2020
+# LastChg: Mar 17, 2020
 
 import redis
 
 from siki.basics import Logger as logger
 from siki.basics.Logger import Priority as p
+from siki.basics.Logger import Logger
 from siki.basics import Exceptions as excepts
 from siki.dstruct.Queue import Queue
 
@@ -26,11 +27,11 @@ class PyRedisPool(object):
 
         if 'bstd' in params.keys() and 'blog' in params.keys() \
             and 'dir' in params.keys() and 'fname' in params.keys():
-            logger.init(bool(params['bstd']), bool(params['blog']), params['dir'], params['fname'])
+            self.logger = Logger(bool(params['bstd']), bool(params['blog']), params['dir'], params['fname'])
         else:
-            logger.init(True, False)
+            self.logger = Logger(True, False)
         
-        logger.message(p.INFO, msg="redis pool ready")
+        self.logger.message(p.INFO, msg="redis pool ready")
     
 
 
@@ -48,7 +49,7 @@ class PyRedisPool(object):
         try:
             redis.Redis(connection_pool=self.pool).set(key, val, secs, millisecs)
         except Exception as e:
-            logger.message(p.ERROR, msg="set variable failed", exception=e)
+            self.logger.message(p.ERROR, msg="set variable failed", exception=e)
     
 
 
@@ -73,7 +74,7 @@ class PyRedisPool(object):
                 pipe.set(key, val, secs, millisecs)
 
         except Exception as e:
-            logger.message(p.ERROR, msg="set variable(s) failed", exception=e)
+            self.logger.message(p.ERROR, msg="set variable(s) failed", exception=e)
 
 
 
@@ -91,7 +92,7 @@ class PyRedisPool(object):
         try:
             return redis.Redis(connection_pool=self.pool).get(key)
         except Exception as e:
-            logger.message(p.ERROR, msg="get variable failed", exception=e)
+            self.logger.message(p.ERROR, msg="get variable failed", exception=e)
 
 
 
@@ -110,7 +111,7 @@ class PyRedisPool(object):
         try:
             return redis.Redis(connection_pool=self.pool).mget(*keys)
         except Exception as e:
-            logger.message(p.ERROR, msg="get variable(s) failed", exception=e)
+            self.logger.message(p.ERROR, msg="get variable(s) failed", exception=e)
 
 
     
@@ -122,7 +123,7 @@ class PyRedisPool(object):
         try:
             return redis.Redis(connection_pool=self.pool).ping()
         except Exception as e:
-            logger.message(p.ERROR, msg="ping redis failed", exception=e)
+            self.logger.message(p.ERROR, msg="ping redis failed", exception=e)
 
     
 
@@ -140,7 +141,7 @@ class PyRedisPool(object):
         try:
             return redis.Redis(connection_pool=self.pool).keys(pattern=pattern)
         except Exception as e:
-            logger.message(p.ERROR, msg="get keys failed", exception=e)
+            self.logger.message(p.ERROR, msg="get keys failed", exception=e)
 
 
 
@@ -152,7 +153,7 @@ class PyRedisPool(object):
         try:
             redis.Redis(connection_pool=self.pool).flushall()
         except Exception as e:
-            logger.message(p.ERROR, msg="flush all keys failed", exception=e)
+            self.logger.message(p.ERROR, msg="flush all keys failed", exception=e)
 
 
 
@@ -170,9 +171,9 @@ class PyRedisPool(object):
             elif type(key) is str:
                 redis.Redis(connection_pool=self.pool).delete(*keys)
             else:
-                logger.message(p.Error, msg="remove key with an invalid key type")
+                self.logger.message(p.Error, msg="remove key with an invalid key type")
         except Exception as e:
-            logger.message(p.ERROR, msg="remove key(s) failed", exception=e)
+            self.logger.message(p.ERROR, msg="remove key(s) failed", exception=e)
 
 
 
@@ -184,7 +185,7 @@ class PyRedisPool(object):
         try:
             return redis.Redis(connection_pool=self.pool).exists(key)
         except Exception as e:
-            logger.message(p.ERROR, msg="failed with some uncertain errors", exception=e)
+            self.logger.message(p.ERROR, msg="failed with some uncertain errors", exception=e)
 
 
 
@@ -200,4 +201,4 @@ class PyRedisPool(object):
         try:
             redis.Redis(connection_pool=self.pool).expire(key, exp)
         except Exception as e:
-            logger.message(p.ERROR, msg="set expiration failed", exception=e)
+            self.logger.message(p.ERROR, msg="set expiration failed", exception=e)
