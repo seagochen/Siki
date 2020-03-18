@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 # Author: Orlando Chen
 # Create: Sep 15, 2018
-# Modifi: Mar 10, 2020
+# Modifi: Mar 17, 2020
 
 from siki.pysql import PySQLConnection as pys
-from siki.basics import Logger as logger
+from siki.basics.Logger import Logger
 from siki.basics.Logger import Priority as p
 from siki.basics import Exceptions as excepts
 from siki.dstruct.Queue import Queue
@@ -33,9 +33,9 @@ class PySQLPool(threading.Thread):
         # init with configure file
         if 'bstd' in params.keys() and 'blog' in params.keys() \
             and 'dir' in params.keys() and 'fname' in params.keys():
-            logger.init(bool(params['bstd']), bool(params['blog']), params['dir'], params['fname'])
+            self.logger = Logger(bool(params['bstd']), bool(params['blog']), params['dir'], params['fname'])
         else:
-            logger.init(True, False)
+            self.logger = Logger(True, False)
 
         try:
             for i in range(size):
@@ -49,10 +49,10 @@ class PySQLPool(threading.Thread):
                 self.pool.enqueue(conn)
             
             # print debug message
-            logger.message(p.INFO, msg="creating connections pool finished")
+            self.logger.message(p.INFO, msg="creating connections pool finished")
         
         except excepts.SQLConnectionException as e:
-            logger.message(p.ERROR, msg="creating connection failed", exception=e)
+            self.logger.message(p.ERROR, msg="creating connection failed", exception=e)
 
 
 
@@ -90,7 +90,7 @@ class PySQLPool(threading.Thread):
 
             # if connection is empty
             if conn is None:
-                logger.message(p.INFO, msg="connection is none, create a new one")
+                self.logger.message(p.INFO, msg="connection is none, create a new one")
                 conn = pys.connect(
                     user=self.params['user'],
                     password=self.params['password'],
@@ -102,7 +102,7 @@ class PySQLPool(threading.Thread):
                 pys.reconnect(conn)
 
         except Exception as e:
-            logger.message(p.ERROR, msg="get connection failed", exception=e)
+            self.logger.message(p.ERROR, msg="get connection failed", exception=e)
 
         finally:
             self.lock.release()
@@ -131,7 +131,7 @@ class PySQLPool(threading.Thread):
                     password=self.params['password'],
                     host=self.params['host'],
                     port=self.params['port']) 
-                logger.message(p.INFO, msg="create a new connection to pool")
+                self.logger.message(p.INFO, msg="create a new connection to pool")
 
                 # enqueue
                 self.put_connection(conn)
@@ -166,12 +166,12 @@ class PySQLPool(threading.Thread):
         try:
             self.lock.acquire()
 
-            logger.message(p.INFO, msg = "closing pool...")
+            self.logger.message(p.INFO, msg = "closing pool...")
             
             while not self.is_empty():
                 pys.disconnect(self.pool.dequeue())
             
-            logger.message(p.INFO, msg = "PySQLPool colsed")
+            self.logger.message(p.INFO, msg = "PySQLPool colsed")
         
         finally:
             self.lock.release()
@@ -224,7 +224,7 @@ class PySQLPool(threading.Thread):
             self.pool.merge(backup)
 
             # refreshing pool
-            logger.message(p.INFO, msg="connections: {}/{}, refresing pool finished...".format(len(backup), self.pool.size()))
+            self.logger.message(p.INFO, msg="connections: {}/{}, refresing pool finished...".format(len(backup), self.pool.size()))
 
         finally:
             self.lock.release()

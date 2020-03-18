@@ -1,19 +1,25 @@
 # -*- coding: utf-8 -*-
 # Author: Orlando Chen
 # Create: May 31, 2018
-# Modifi: May 31, 2018
+# Modifi: Mar 17, 2020
 
 import hashlib
 
 
 def md5(data):
-    data = data.encode("UTF8")
+    # To be extra safe in python 3, encode text conditionally before concatenating with pad.
+    if not isinstance(data, bytes):
+        data = data.encode('utf-8')
+
     md5 = hashlib.md5(data)
     return md5.hexdigest()
 
 
 def sha1(data):
-    data = data.encode("UTF8")
+    # To be extra safe in python 3, encode text conditionally before concatenating with pad.
+    if not isinstance(data, bytes):
+        data = data.encode('utf-8')
+
     sha1 = hashlib.sha1(data)
     return sha1.hexdigest()
 
