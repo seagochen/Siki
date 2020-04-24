@@ -38,7 +38,7 @@ def time_since1970():
     return time.time()
 
 
-def time_now_foramt(format = "%Y-%m-%d %H:%M:%S"):
+def time_now_with_foramt(format = "%Y-%m-%d %H:%M:%S"):
     """
     Returning a formatted string of time
 
