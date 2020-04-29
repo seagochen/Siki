@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Author: Orlando Chen
 # Created: Feb 07, 2020
-# LastChg: Feb 26, 2020
+# LastChg: Apr 24, 2020
 
 import re
 import xml.etree.ElementTree as etree
@@ -18,19 +18,28 @@ class ApplyingXMLRules(object):
 
 
 
-    def __init__(self, filename):
-        if not fu.isfile(filename):
-            raise excepts.CannotParseException("filename {} cannot parse, because invalid name or file path".format(filename))
+    def __init__(self, xml: str, fromFile = True):
+        if fromFile:
+            if not fu.isfile(xml):
+                raise excepts.CannotParseException("filename {} cannot parse, because invalid name or file path".format(xml))
 
-        # parsing xml
-        xml = etree.parse(filename)
+            # parsing xml
+            xml = etree.parse(xml)
 
-        if xml is None:
-            raise excepts.InvalidParamException("parse xml file failed")
+            if xml is None:
+                raise excepts.InvalidParamException("parse xml file failed")
 
-        self.xmlroot = xml.getroot()
+            self.xmlroot = xml.getroot()
+        
+        else:
+            # parsing string
+            xml = etree.fromstring(xml)
 
+            if xml is None:
+                raise excepts.InvalidParamException("parse xml string failed")
 
+            self.xmlroot = xml
+        
 
 
     def _has_sql_keywords(self, args):
