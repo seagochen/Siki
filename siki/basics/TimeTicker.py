@@ -8,7 +8,8 @@ MS_PER_MINUTE = 60000
 MS_PER_HOUR = 3600000
 MS_PER_DAY = 86400000
 
-def debug_msg_with_timestamp(strMessage = None):
+
+def debug_msg_with_timestamp(strMessage = None) -> str:
     """
     return to caller a string message with timestamp for debug purpose
 
@@ -27,7 +28,7 @@ def debug_msg_with_timestamp(strMessage = None):
         return "{0} {1}".format(timestamp, strMessage)
 
 
-def time_since1970():
+def time_since1970() -> float:
     """
     Returning a decimal number with couting the last seconds since 1970
 
@@ -38,7 +39,7 @@ def time_since1970():
     return time.time()
 
 
-def time_now_with_foramt(format = "%Y-%m-%d %H:%M:%S"):
+def time_now_with_foramt(format = "%Y-%m-%d %H:%M:%S") -> str:
     """
     Returning a formatted string of time
 

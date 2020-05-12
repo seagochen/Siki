@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 # Author: Orlando Chen
 # Create: May 31, 2018
-# Modifi: Sep 21, 2018
+# Modifi: May 12, 2018
 
 import re
 import ntpath
 
 from siki.basics.Exceptions import NoAvailableResourcesFoundException
 from siki.basics.Exceptions import InvalidParamException
+
+from siki.basics import Convert
 
 def gen_folderpath(strPrev, *strLast):
     import os
@@ -34,7 +36,7 @@ def gen_filename(strFilename, strSuffix=None, strAddition=None):
     return strFilename + "." + strAddition + "." + strSuffix
 
 
-def read_file(strFilepath, nReadSize = 4096, callback_func=None):
+def read_file(strFilepath: str, nReadSize = 4096, callback_func=None):
     with open(file=strFilepath, mode="rb") as f:
 
         if not f.readable(): 
@@ -50,17 +52,34 @@ def read_file(strFilepath, nReadSize = 4096, callback_func=None):
 
 
 
-def write_file(strFilepath, rawData, bAppend=False):
-    if not bAppend:
-        f = open(file=strFilepath, mode="wb")
-    else:
-        f = open(file=strFilepath, mode="a+b")
+def write_file(filepath: str, data: object, append=False):
+    if not data:
+        raise NoAvailableResourcesFoundException("Data cannot be null or empty")
 
+    if not filepath:
+        raise NoAvailableResourcesFoundException("Filepath is incorrect")
+
+    if append:
+        f = open(file=filepath, mode='a+b')
+    else:
+        f = open(file=filepath, mode='wb')
+    
     if not f.writable():
         raise NoAvailableResourcesFoundException("Cannot write file")
 
-    if rawData is not None and len(rawData) > 0:
-        f.write(rawData)
+    # data convertion
+    if isinstance(data, list):
+        data = Convert.list_to_string(data)
+    
+    if isinstance(data, dict):
+        data = Convert.dict_to_string(data)
+    
+    if not isinstance(data, str) or not isinstance(data, bytes):
+        # trying to convert the data to string
+        data = str(data)
+    
+    # write to file
+    f.write(data)
 
 
 def touch_file(strFilepath):
