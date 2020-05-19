@@ -11,6 +11,7 @@ from siki.basics.Exceptions import InvalidParamException
 
 from siki.basics import Convert
 
+
 def gen_folderpath(strPrev, *strLast):
     import os
     strDir = strPrev
@@ -19,10 +20,12 @@ def gen_folderpath(strPrev, *strLast):
     return strDir
 
 
+
 def gen_filepath(strFolder, strFilename, strSuffix=None, strAddition=None):
     import os
     strDir = os.path.join(strFolder, gen_filename(strFilename, strSuffix, strAddition))
     return os.path.abspath(strDir)
+
 
 
 def gen_filename(strFilename, strSuffix=None, strAddition=None):
@@ -34,6 +37,7 @@ def gen_filename(strFilename, strSuffix=None, strAddition=None):
         return strFilename + "." + strSuffix
     
     return strFilename + "." + strAddition + "." + strSuffix
+
 
 
 def read_file(strFilepath: str, nReadSize = 4096, callback_func=None):
@@ -53,33 +57,49 @@ def read_file(strFilepath: str, nReadSize = 4096, callback_func=None):
 
 
 def write_file(filepath: str, data: object, append=False):
+   
+    # data is null
     if not data:
         raise NoAvailableResourcesFoundException("Data cannot be null or empty")
 
+    # filepath is null
     if not filepath:
         raise NoAvailableResourcesFoundException("Filepath is incorrect")
 
-    if append:
-        f = open(file=filepath, mode='a+b')
-    else:
-        f = open(file=filepath, mode='wb')
-    
-    if not f.writable():
-        raise NoAvailableResourcesFoundException("Cannot write file")
-
-    # data convertion
+    # list convertion
     if isinstance(data, list):
         data = Convert.list_to_string(data)
     
+    # dictionary convertion
     if isinstance(data, dict):
         data = Convert.dict_to_string(data)
     
-    if not isinstance(data, str) or not isinstance(data, bytes):
-        # trying to convert the data to string
+    # neither str nor bytes
+    # trying to convert the data to string
+    if not isinstance(data, str) and not isinstance(data, bytes):
         data = str(data)
-    
-    # write to file
+
+    # data is bytes
+    if isinstance(data, bytes):
+        if append:
+            f = open(file=filepath, mode='a+b')
+        else:
+            f = open(file=filepath, mode='wb')
+
+    # data is str
+    if isinstance(data, str):
+        if append:
+            f = open(file=filepath, mode='a+')
+        else:
+            f = open(file=filepath, mode='w')
+
+    if not f.writable():
+        raise NoAvailableResourcesFoundException("Cannot write file")
+
+    # write file
     f.write(data)
+    f.close()
+
 
 
 def touch_file(strFilepath):
@@ -90,6 +110,7 @@ def touch_file(strFilepath):
     f.close()
 
 
+
 def mkdir(strDirectory):
     """
     Calling this method will create an empty folder
@@ -97,6 +118,7 @@ def mkdir(strDirectory):
     import os
     if not os.path.exists(strDirectory):
         os.makedirs(strDirectory)
+
 
 
 def rmfile(strFilepath):
@@ -109,6 +131,7 @@ def rmfile(strFilepath):
     os.remove(strFilepath)
 
 
+
 def rmdir(strFolder):
     """
     Calling this method will delete the folder forcely
@@ -118,18 +141,25 @@ def rmdir(strFolder):
         raise NoAvailableResourcesFoundException("Directory path is not existed!")
     shutil.rmtree(strFolder, ignore_errors=True)
 
+
+
 def isfile(path):
     import os
     return os.path.isfile(path)
+
 
 
 def isdir(path):
     import os
     return os.path.isdir(path)
 
+
+
 def exists(path):
     import os
     return os.path.lexists(path)
+
+
 
 def move(path1, path2):
     import os
@@ -137,6 +167,8 @@ def move(path1, path2):
     # no file src exists
     if exists(path1):
         move(path1, path2)
+
+
 
 def copy(path1, path2): # just trying to copy file
     from shutil import copy2, copytree
@@ -146,10 +178,12 @@ def copy(path1, path2): # just trying to copy file
         copytree(path1, path2)
 
 
+
 def search_files(strFolderPath, pattern="*"):
 
     lFiles = _file_ite(strFolderPath)
     return _file_filtering(lFiles, pattern)
+
 
 
 def search_folders(strFolderPath):
@@ -163,12 +197,14 @@ def search_folders(strFolderPath):
     return lDirs
 
 
+
 def root_leaf(path):
     """
     return root, leaf
     """
     head, tail = ntpath.split(path)
     return ntpath.basename(head), tail
+
 
 
 def _file_ite(strFolderPath):
@@ -183,6 +219,7 @@ def _file_ite(strFolderPath):
             flist.append(path)
     return flist
     
+
 
 def _file_filtering(lfs, pattern):
     l = []

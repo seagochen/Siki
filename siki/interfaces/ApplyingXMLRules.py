@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Author: Orlando Chen
 # Created: Feb 07, 2020
-# LastChg: Apr 24, 2020
+# Modified: Apr 24, 2020
 
 import re
 import xml.etree.ElementTree as etree

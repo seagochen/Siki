@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Author: Orlando Chen
 # Created: May 09, 2018
-# LastChg: Mar 11, 2020
+# Modified: Mar 11, 2020
 
 MS_PER_SECOND = 1000
 MS_PER_MINUTE = 60000

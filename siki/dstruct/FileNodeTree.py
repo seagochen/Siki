@@ -73,10 +73,10 @@ class FileNodeTree(object):
             # delete a leaf in file tree
             if leaf.leaves_count() > 0: # has children leaves, must merge them to the root
                 for l in leaf.leaves:
-                    root.append_node(l) 
+                    root._append_node(l)
             
             # now remove the node from root
-            root.leaves.remove(leaf)
+            root._item_leaves.remove(leaf)
             return leaf
     
 
@@ -289,7 +289,7 @@ class FileNodeTree(object):
                         dlist.append(node)
                     else:
                         dlist.append(path)
-                    if len(node.leaves) > 0:
+                    if len(node._item_leaves) > 0:
                         sub_dlist = node.only_dirs(nmode, node)
                         if len(sub_dlist) > 0:
                             dlist.extend(sub_dlist)

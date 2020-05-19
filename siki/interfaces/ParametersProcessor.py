@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Author: Orlando Chen
 # Created: Feb 19, 2020
-# LastChg: Feb 19, 2020
+# Modified: Feb 19, 2020
 
 
 from siki.dstruct import DictExtern as dictext

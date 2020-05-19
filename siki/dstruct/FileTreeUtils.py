@@ -75,9 +75,9 @@ def generate_list(tree):
     #pattern = re.compile(pattern)
     pathes = []
     
-    if len(tree.leaves) > 0: # has children
-        for leaf in tree.leaves:
-            if len(leaf.leaves) <= 0:
+    if len(tree._item_leaves) > 0: # has children
+        for leaf in tree._item_leaves:
+            if len(leaf._item_leaves) <= 0:
                 pathes.append(leaf.generate_path())
             else:
                 sub_pathes = generate_list(leaf)
@@ -93,13 +93,13 @@ def copy_tree(tree):
     # create a main node with the same name of tree
     mainTree = FileNodeTree(tree.name)
 
-    for leaf in tree.leaves:
-        if len(leaf.leaves) > 0:
+    for leaf in tree._item_leaves:
+        if len(leaf._item_leaves) > 0:
             subTree = copy_tree(leaf)
-            mainTree.append_node(subTree)
+            mainTree._append_node(subTree)
         else:
             subLeaf = FileNodeTree(leaf.name)
-            mainTree.append_node(subLeaf)
+            mainTree._append_node(subLeaf)
     
     return mainTree
 
