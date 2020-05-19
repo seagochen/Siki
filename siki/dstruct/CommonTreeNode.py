@@ -20,6 +20,9 @@ class CommonTreeNode(object):
         if isinstance(self._item_root, CommonTreeNode):
             return self._item_root._item_id
 
+    def self_id(self):
+        return self._item_id
+
     def _append_node(self, leaf: object):
         if not isinstance(leaf, CommonTreeNode):
             raise Exceptions.InvalidParamException("node must be an instance of TreeNode")
@@ -31,12 +34,14 @@ class CommonTreeNode(object):
         else:
             raise Exceptions.InvalidParamException("node id can not be the same in tree")
 
-    def search_append(self, item_id, item_name, item_gid):
-        tree = self.search_tree(item_gid)
+    def search_append(self, item_id, item_name, item_fid):
+        tree = self.search_tree(item_fid)
 
         if isinstance(tree, CommonTreeNode):
             node = CommonTreeNode(item_id, item_name)
             tree._append_node(node)
+
+        return tree
 
     def search_delete(self, leaf_id):
         if not isinstance(leaf_id, type(self._item_id)):
@@ -61,7 +66,7 @@ class CommonTreeNode(object):
             return self
 
         for leaf in self._item_leaves:   # this node is not we want
-            if leaf._item_id == leaf_id:  # found
+            if leaf.self_id() == leaf_id:  # found
                 return leaf
 
             else:
@@ -79,6 +84,8 @@ class CommonTreeNode(object):
         if isinstance(leaf, CommonTreeNode):
             leaf._item_val = leaf_val
 
+        return leaf
+
     def _check_id_valid(self, leaf_id):
         if not isinstance(leaf_id, type(self._item_id)):
             raise Exceptions.InvalidParamException("leaf id must be the same type of TreeNode id")
@@ -87,7 +94,7 @@ class CommonTreeNode(object):
             return False
 
         for leaf in self._item_leaves:
-            if leaf._item_id == leaf_id:
+            if leaf.self_id() == leaf_id:
                 return False
 
         return True
@@ -97,15 +104,16 @@ class CommonTreeNode(object):
             output = {
                 "id": self._item_id,
                 "name": self._item_val,
-                "gid": self._item_root._item_id
+                "fid": self._item_root._item_id
             }
         else:
             output = {
                 "id": self._item_id,
                 "name": self._item_val,
-                "gid": None
+                "fid": None
             }
 
+        # trying to add children to list
         if len(self._item_leaves) <= 0:
             return output
 
@@ -117,12 +125,35 @@ class CommonTreeNode(object):
             output["leaves"] = subtrees
             return output
 
+    def generate_list(self):
+        if isinstance(self._item_root, CommonTreeNode):
+            output = [{
+                "id": self._item_id,
+                "name": self._item_val,
+                "fid": self._item_root._item_id
+            }]
+        else:
+            output = [{
+                "id": self._item_id,
+                "name": self._item_val,
+                "fid": None
+            }]
+
+        # trying to add children to list
+        if len(self._item_leaves) <= 0:
+            return output
+
+        else:
+            for child in self._item_leaves:
+                output.extend(child.generate_list())
+
+            return output
+
     def __str__(self):
         return Convert.dict_to_string(self.generate_tree())
 
     def __len__(self):
         return len(self._item_leaves)
-
 
 # if __name__ == "__main__":
 #     tree = CommonTreeNode(0, 'root')
