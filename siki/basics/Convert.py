@@ -50,23 +50,23 @@ def dict_to_binary(dictionary: dict) -> bytes:
     """
     this function will convert a dictionary to binary type
     """
-    strdata = dict_to_string(dictionary)
-    return string_to_binary(strdata)
+    str_data = dict_to_string(dictionary)
+    return string_to_binary(str_data)
 
 
 def binary_to_dict(binary: bytes) -> dict:
     """
     this function wil convert a binary to dictionary
     """
-    strdata = binary_to_string(binary)
-    return string_to_dict(strdata)
+    str_data = binary_to_string(binary)
+    return string_to_dict(str_data)
 
 
 def list_to_string(list_obj: list, sep=",") -> str:
     """
     this function will convert a list to string
     """
-    if type(list_obj) is list:
+    if isinstance(list_obj, list):
         # using list comprehension 
         return "[" + sep.join([str(elem) for elem in list_obj]) + "]"
     else:

@@ -1,79 +1,88 @@
 # -*- coding: utf-8 -*-
 # Author: Orlando Chen
 # Create: May 31, 2018
-# Modifi: May 12, 2018
+# Modified: May 25, 2020
 
-import re
 import ntpath
+import re
 
+from siki.basics import Convert
 from siki.basics.Exceptions import NoAvailableResourcesFoundException
 from siki.basics.Exceptions import InvalidParamException
 
-from siki.basics import Convert
-
-
-def gen_folderpath(strPrev, *strLast):
+def gen_folder_path(prev: str, *last: list):
     import os
-    strDir = strPrev
-    for strL in strLast:
-        strDir = os.path.join(strDir, strL)
-    return strDir
+
+    directory = prev
+    for strL in last:
+        directory = os.path.join(directory, strL)
+    return directory
 
 
-
-def gen_filepath(strFolder, strFilename, strSuffix=None, strAddition=None):
+def gen_file_path(folder: str, filename: str, suffix: str = None, addition: str = None):
     import os
-    strDir = os.path.join(strFolder, gen_filename(strFilename, strSuffix, strAddition))
-    return os.path.abspath(strDir)
+    directory = os.path.join(folder, gen_filename(filename, suffix, addition))
+    return os.path.abspath(directory)
 
 
+def gen_filename(filename: str, suffix: str = None, addition: str = None):
+    if suffix is None and addition is not None:
+        return filename + "." + addition
+    if suffix is None and addition is None:
+        return filename
+    if suffix is not None and addition is None:
+        return filename + "." + suffix
 
-def gen_filename(strFilename, strSuffix=None, strAddition=None):
-    if strSuffix is None and strAddition is not None:
-        return strFilename + "." + strAddition
-    if strSuffix is None and strAddition is None:
-        return strFilename
-    if strSuffix is not None and strAddition is None:
-        return strFilename + "." + strSuffix
-    
-    return strFilename + "." + strAddition + "." + strSuffix
-
+    return filename + "." + addition + "." + suffix
 
 
-def read_file(strFilepath: str, nReadSize = 4096, callback_func=None):
-    with open(file=strFilepath, mode="rb") as f:
+def read_file(file_path: str, read_size: int = 4096, callback: object = None):
+    with open(file=file_path, mode="rb") as f:
 
-        if not f.readable(): 
-            raise NoAvailableResourcesFoundException("Cannot load file")
-        
-        if callback_func is not None:
-            data = f.read(nReadSize)
+        if not f.readable():
+            raise NoAvailableResourcesFoundException("Cannot load file itself")
+
+        if callback is not None:
+            data = f.read(read_size)
             while data is not None and len(data) > 0:
-                callback_func(data)
-                data = f.read(nReadSize)
+                callback(data)
+                data = f.read(read_size)
         else:
             return f.read()
 
 
+def read_file_by_line(file_path: str, callback: object = None):
+    # read whole file content
+    data = read_file(file_path)
 
-def write_file(filepath: str, data: object, append=False):
-   
+    if data is not None and len(data) > 0:
+        str_context = Convert.binary_to_string(data)
+        lines = str_context.split('\n')
+
+        for line in lines:
+            yield line
+
+    else:
+        yield ''
+
+
+def write_file(file_path: str, data: object, append=False):
     # data is null
     if not data:
         raise NoAvailableResourcesFoundException("Data cannot be null or empty")
 
-    # filepath is null
-    if not filepath:
-        raise NoAvailableResourcesFoundException("Filepath is incorrect")
+    # file path is null
+    if not file_path:
+        raise NoAvailableResourcesFoundException("File path is incorrect")
 
-    # list convertion
+    # list conversion
     if isinstance(data, list):
         data = Convert.list_to_string(data)
-    
-    # dictionary convertion
+
+    # dictionary conversion
     if isinstance(data, dict):
         data = Convert.dict_to_string(data)
-    
+
     # neither str nor bytes
     # trying to convert the data to string
     if not isinstance(data, str) and not isinstance(data, bytes):
@@ -82,18 +91,21 @@ def write_file(filepath: str, data: object, append=False):
     # data is bytes
     if isinstance(data, bytes):
         if append:
-            f = open(file=filepath, mode='a+b')
+            f = open(file=file_path, mode='a+b')
         else:
-            f = open(file=filepath, mode='wb')
+            f = open(file=file_path, mode='wb')
 
     # data is str
-    if isinstance(data, str):
+    elif isinstance(data, str):
         if append:
-            f = open(file=filepath, mode='a+')
+            f = open(file=file_path, mode='a+')
         else:
-            f = open(file=filepath, mode='w')
+            f = open(file=file_path, mode='w')
 
-    if not f.writable():
+    else:
+        raise InvalidParamException('Cannot write data to file, because of unknown type of data')
+
+    if f is None or not f.writable():
         raise NoAvailableResourcesFoundException("Cannot write file")
 
     # write file
@@ -101,76 +113,67 @@ def write_file(filepath: str, data: object, append=False):
     f.close()
 
 
-
-def touch_file(strFilepath):
+def touch_file(file_path: str):
     """
     Calling this method will create an empty file
     """
-    f = open(strFilepath, "w")
+    f = open(file_path, "w")
     f.close()
 
 
-
-def mkdir(strDirectory):
+def mkdir(directory: str):
     """
     Calling this method will create an empty folder
     """
     import os
-    if not os.path.exists(strDirectory):
-        os.makedirs(strDirectory)
+    if not os.path.exists(directory):
+        os.makedirs(directory)
 
 
-
-def rmfile(strFilepath):
+def rmfile(file_path: str):
     """
     Calling this method will delete a single file forcely
     """
     import os
-    if not os.path.exists(strFilepath):
+    if not os.path.exists(file_path):
         raise NoAvailableResourcesFoundException("File path is not existed!")
-    os.remove(strFilepath)
+    os.remove(file_path)
 
 
-
-def rmdir(strFolder):
+def rmdir(directory: str):
     """
     Calling this method will delete the folder forcely
     """
-    import os, shutil
-    if not os.path.exists(strFolder):
+    import shutil
+    import os
+    if not os.path.exists(directory):
         raise NoAvailableResourcesFoundException("Directory path is not existed!")
-    shutil.rmtree(strFolder, ignore_errors=True)
+    shutil.rmtree(directory, ignore_errors=True)
 
 
-
-def isfile(path):
+def isfile(path: str):
     import os
     return os.path.isfile(path)
 
 
-
-def isdir(path):
+def isdir(path: str):
     import os
     return os.path.isdir(path)
 
 
-
-def exists(path):
+def exists(path: str):
     import os
     return os.path.lexists(path)
 
 
-
-def move(path1, path2):
-    import os
+def move(path1: str, path2: str):
     from shutil import move
     # no file src exists
     if exists(path1):
         move(path1, path2)
 
 
-
-def copy(path1, path2): # just trying to copy file
+def copy(path1: str, path2: str):  # just trying to copy file
     from shutil import copy2, copytree
     if exists(path1) and isfile(path1):
         copy2(path1, path2)
@@ -178,27 +181,23 @@ def copy(path1, path2): # just trying to copy file
         copytree(path1, path2)
 
 
-
-def search_files(strFolderPath, pattern="*"):
-
-    lFiles = _file_ite(strFolderPath)
-    return _file_filtering(lFiles, pattern)
+def search_files(folder_path: str, pattern: str = "*"):
+    file_list = _file_ite(folder_path)
+    return _file_filtering(file_list, pattern)
 
 
-
-def search_folders(strFolderPath):
+def search_folders(folder_path: str):
     import os
-    lDirs = []
-    for i in os.listdir(strFolderPath):
-        path = os.path.join(strFolderPath, i)
+    dir_list = []
+    for i in os.listdir(folder_path):
+        path = os.path.join(folder_path, i)
         if os.path.isdir(path):
-            lDirs.extend(search_folders(path))
-        lDirs.append(path)
-    return lDirs
+            dir_list.extend(search_folders(path))
+        dir_list.append(path)
+    return dir_list
 
 
-
-def root_leaf(path):
+def root_leaf(path: str):
     """
     return root, leaf
     """
@@ -206,27 +205,25 @@ def root_leaf(path):
     return ntpath.basename(head), tail
 
 
-
-def _file_ite(strFolderPath):
+def _file_ite(folder_path: str):
     import os
 
-    flist = []
-    for i in os.listdir(strFolderPath):
-        path = os.path.join(strFolderPath, i)
+    file_list = []
+    for i in os.listdir(folder_path):
+        path = os.path.join(folder_path, i)
         if os.path.isdir(path):
-            flist.extend(_file_ite(path))
+            file_list.extend(_file_ite(path))
         else:
-            flist.append(path)
-    return flist
-    
+            file_list.append(path)
+    return file_list
 
 
 def _file_filtering(lfs, pattern):
-    l = []
+    file_list = []
     if "*" == pattern:
-        l.extend(lfs)
+        file_list.extend(lfs)
     else:
         for f in lfs:
             if re.search(pattern, f):
-                l.append(f)
-    return l
+                file_list.append(f)
+    return file_list

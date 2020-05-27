@@ -36,7 +36,7 @@ class Logger(object):
         timestamp = datetime.datetime.now().strftime("%Y%m%d")
         
         #return fileutil.gen_path(dir, file, "log", timestamp)
-        return fileutil.gen_filepath(dir, file, "log", timestamp)
+        return fileutil.gen_file_path(dir, file, "log", timestamp)
 
 
     def _check_valid_file(self, dir, file):
