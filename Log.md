@@ -1,8 +1,13 @@
 # Log
 
+## [Jun 10, 2010]
+* Fixed a lot of bugs
+* Optimized the performance
+* Calling for a reference... OTL.
+
 ## [May 12, 2020]
-* Modified the code, fixed some bugs, and then integrated the server development related parts into the new project 'Matsuki'.
-* Removed other code that is not related to Python, in order to better cross-platform, and the end of file format in some code has been distinguished and optimized.
+* Modified the code, fixed some bugs, and moved flask-related modules to a new project, which named 'Matsuki'.
+* For cross-platform purpose, I removed some code that not written in Python
 
 ## [May 14, 2018]
 
