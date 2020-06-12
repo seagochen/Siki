@@ -32,7 +32,7 @@ def get_dictval_from_param(xmlnode, param):
     final_key = xmlnode.attrib["name"]
     final_val = {}
 
-    for sub in xmlnode: # convert the value
+    for sub in xmlnode:  # convert the value
 
         sub_attrib = sub.attrib
 
@@ -53,8 +53,7 @@ def get_dictval_from_param(xmlnode, param):
 
         final_val = dictext.union(final_val, subdict)
 
-    return {final_key:final_val}
-
+    return {final_key: final_val}
 
 
 def get_listval_from_param(xmlnode, key, val):
@@ -71,8 +70,8 @@ def get_listval_from_param(xmlnode, key, val):
     * [dict] with the new key-value pair
     """
 
-    if key != xmlnode["mapping"]: # because list node has no default values, so just return an empty list instead
-        return {xmlnode["name"]:[]}
+    if key != xmlnode["mapping"]:  # because list node has no default values, so just return an empty list instead
+        return {xmlnode["name"]: []}
 
     # in order to distinguish the string list, 
     # we agreed to use comma as segmentation symbol
@@ -84,21 +83,21 @@ def get_listval_from_param(xmlnode, key, val):
     final_key = xmlnode["name"]
     final_val = []
 
-    if xmlnode["v_type"] == "number": # tokens will be converted to a number list
+    if xmlnode["v_type"] == "number":  # tokens will be converted to a number list
         for t in tokens:
             final_val.append(strconv.convert_string_number(t))
-    elif xmlnode["v_type"] == "float": # tokens will be converted to a float list
+    elif xmlnode["v_type"] == "float":  # tokens will be converted to a float list
         for t in tokens:
             final_val.append(strconv.convert_string_float(t))
-    elif xmlnode["v_type"] == "boolean": # tokens will be converted to a boolean list
+    elif xmlnode["v_type"] == "boolean":  # tokens will be converted to a boolean list
         for t in tokens:
-            final_val.append(strconv.convert_string_boolean(t))        
-    else: # tokens will be converted to a string list
+            final_val.append(strconv.convert_string_boolean(t))
+    else:  # tokens will be converted to a string list
         for t in tokens:
             final_val.append(strconv.convert_string_none(t))
 
     # success
-    return {final_key:final_val}
+    return {final_key: final_val}
 
 
 def get_strval_from_param(xmlnode, key, val):
@@ -115,20 +114,19 @@ def get_strval_from_param(xmlnode, key, val):
     * [dict] with the new key-value pair
     """
 
-    if key != xmlnode["mapping"]: # incorrect mapping, return the default to caller
-        return {xmlnode["name"]:strconv.convert_string_none(xmlnode["default"])} # to prevent none-str return
+    if key != xmlnode["mapping"]:  # incorrect mapping, return the default to caller
+        return {xmlnode["name"]: strconv.convert_string_none(xmlnode["default"])}  # to prevent none-str return
 
     # to prevent none-str or empty string return
     final_key = xmlnode["name"]
     final_val = None
     if val is None or val == '':
-        return {xmlnode["name"]:strconv.convert_string_none(xmlnode["default"])} # to prevent none-str return
+        return {xmlnode["name"]: strconv.convert_string_none(xmlnode["default"])}  # to prevent none-str return
     else:
-        final_val = strconv.convert_string_none(val) # to prevent none-str return
+        final_val = strconv.convert_string_none(val)  # to prevent none-str return
 
     # success
-    return {final_key:final_val}
-
+    return {final_key: final_val}
 
 
 def get_numval_from_param(xmlnode, key, val):
@@ -143,22 +141,21 @@ def get_numval_from_param(xmlnode, key, val):
 
     Returns:
     * [dict] with the new key-value pair
-    """    
+    """
 
-    if key != xmlnode["mapping"]: # incorrect mapping, return the default to caller
-        return {xmlnode["name"]:strconv.convert_string_number(xmlnode["default"])}
+    if key != xmlnode["mapping"]:  # incorrect mapping, return the default to caller
+        return {xmlnode["name"]: strconv.convert_string_number(xmlnode["default"])}
 
     # to prevent none-str or empty string return
     final_key = xmlnode["name"]
     final_val = None
     if val is None or val == '':
-        return {xmlnode["name"]:strconv.convert_string_number(xmlnode["default"])}
+        return {xmlnode["name"]: strconv.convert_string_number(xmlnode["default"])}
     else:
         final_val = strconv.convert_string_number(val)
 
     # success
-    return {final_key:final_val}
-
+    return {final_key: final_val}
 
 
 def get_floatval_from_param(xmlnode, key, val):
@@ -173,21 +170,21 @@ def get_floatval_from_param(xmlnode, key, val):
 
     Returns:
     * [dict] with the new key-value pair
-    """ 
+    """
 
-    if key != xmlnode["mapping"]: # incorrect mapping, return the default to caller
-        return {xmlnode["name"]:strconv.convert_string_float(xmlnode["default"])}
+    if key != xmlnode["mapping"]:  # incorrect mapping, return the default to caller
+        return {xmlnode["name"]: strconv.convert_string_float(xmlnode["default"])}
 
     # to prevent none-str or empty string return
     final_key = xmlnode["name"]
     final_val = None
     if val is None or val == '':
-        return {xmlnode["name"]:strconv.convert_string_float(xmlnode["default"])}
+        return {xmlnode["name"]: strconv.convert_string_float(xmlnode["default"])}
     else:
         final_val = strconv.convert_string_float(val)
 
     # success
-    return {final_key:final_val}
+    return {final_key: final_val}
 
 
 def get_boolval_from_param(xmlnode, key, val):
@@ -204,16 +201,16 @@ def get_boolval_from_param(xmlnode, key, val):
     * [dict] with the new key-value pair
     """
 
-    if key != xmlnode["mapping"]: # incorrect mapping, return the default to caller
-        return {xmlnode["name"]:strconv.convert_string_boolean(xmlnode["default"])}
+    if key != xmlnode["mapping"]:  # incorrect mapping, return the default to caller
+        return {xmlnode["name"]: strconv.convert_string_boolean(xmlnode["default"])}
 
     # to prevent none-str or empty string return
     final_key = xmlnode["name"]
     final_val = None
     if val is None or val == '':
-        return {xmlnode["name"]:strconv.convert_string_boolean(xmlnode["default"])}
+        return {xmlnode["name"]: strconv.convert_string_boolean(xmlnode["default"])}
     else:
         final_val = strconv.convert_string_boolean(val)
 
     # success
-    return {final_key:final_val}
+    return {final_key: final_val}

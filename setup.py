@@ -8,7 +8,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="siki",
-    version="0.1.4.6",
+    version="0.1.4.7",
     author="Orlando Chen",
     author_email="seagochen@hotmail.com",
     description="A collection of tools that may be used to help users coding with Python in an easy way",
@@ -16,7 +16,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/seagochen/Siki",
     packages=setuptools.find_packages(),
-    #install_requires=[],
+    install_requires=['pptree'],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",

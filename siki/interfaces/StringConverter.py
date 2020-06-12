@@ -3,9 +3,7 @@
 # Created: Feb 13, 2020
 # Modified: Feb 18, 2020
 
-import re
-
-from siki.basics import Validators as valid
+from siki.basics import Validators
 
 
 def convert_string_none(value):
@@ -41,7 +39,7 @@ def convert_string_number(value):
     this method will convert string data to python number
     """
     if type(value) is str:
-        if valid.check_number(value):
+        if Validators.check_number(value):
             return int(value)
     
     return 0 # to prevent other invalid cases
@@ -52,7 +50,7 @@ def convert_string_float(value):
     this method will convert string data to python float
     """
     if type(value) is str:
-        if valid.check_float(value):
+        if Validators.check_float(value):
             return float(value)
 
     return 0.0 # to prevent other invalid cases

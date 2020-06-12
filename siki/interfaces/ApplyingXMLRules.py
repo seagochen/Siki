@@ -4,57 +4,45 @@
 # Modified: Apr 24, 2020
 
 import re
-import xml.etree.ElementTree as etree
 
-from siki.basics import FileUtils as fu
-from siki.basics import Exceptions as excepts
-from siki.basics import Validators as valid
-from siki.interfaces import ParametersProcessor as proc
-
+from siki.basics import Exceptions
+from siki.basics import FileUtils
 from siki.dstruct import DictExtern
+from siki.interfaces import ParametersProcessor
 
 
 class ApplyingXMLRules(object):
 
-
-
-    def __init__(self, xml: str, fromFile = True):
+    def __init__(self, xml: str, fromFile=True):
         if fromFile:
-            if not fu.isfile(xml):
-                raise excepts.CannotParseException("filename {} cannot parse, because invalid name or file path".format(xml))
+            if not FileUtils.isfile(xml):
+                raise Exceptions.CannotParseException(
+                    "filename {} cannot parse, because invalid name or file path".format(xml))
 
             # parsing xml
-            xml = etree.parse(xml)
+            xml = xml.etree.ElementTree.parse(xml)
 
             if xml is None:
-                raise excepts.InvalidParamException("parse xml file failed")
+                raise Exceptions.InvalidParamException("parse xml file failed")
 
             self.xmlroot = xml.getroot()
-        
+
         else:
             # parsing string
-            xml = etree.fromstring(xml)
+            xml = xml.etree.ElementTree.fromstring(xml)
 
             if xml is None:
-                raise excepts.InvalidParamException("parse xml string failed")
+                raise Exceptions.InvalidParamException("parse xml string failed")
 
             self.xmlroot = xml
-        
-
 
     def _has_sql_keywords(self, args):
         pattern = r"(ALTER|CREATE|DELETE|DROP|EXEC(UTE){0,1}|INSERT( +INTO){0,1}|MERGE|SELECT|UPDATE|UNION( +ALL){0,1})"
         return re.search(pattern, args) is not None
 
-
-
-    
     def _has_valid_chars(self, arg):
         pattern = u"^([\u4e00-\u9fa5]|[0-9a-zA-Z]|\s|-|:|\.|_)+$"
         return re.match(pattern, arg) is not None
-
-
-
 
     def _sql_prevention(self, value):
         """
@@ -71,8 +59,6 @@ class ApplyingXMLRules(object):
 
         return False
 
-
-
     def _specialize_sql_prevention_for_list(self, value):
 
         if type(value) is not str:
@@ -84,14 +70,12 @@ class ApplyingXMLRules(object):
 
         pattern = r"(ALTER|CREATE|DELETE|DROP|EXEC(UTE){0,1}|INSERT( +INTO){0,1}|MERGE|SELECT|UPDATE|UNION( +ALL){0,1})"
         m = re.match(pattern, value)
-        if m is not None: # trying to replace blank
+        if m is not None:  # trying to replace blank
             for t in m.groups():
-                if t is not None: # trying to replace
+                if t is not None:  # trying to replace
                     value.replace(t, "")
 
         return False
-
-
 
     def _obtain_valid_keyval_primary_types(self, xml_attrib: dict, request_params: dict):
         # value from request parameters
@@ -101,9 +85,6 @@ class ApplyingXMLRules(object):
             return xml_attrib["mapping"], xml_attrib["default"]
         else:
             return xml_attrib["mapping"], map_val
-
-
-
 
     def _obtain_valid_keyval_from_list(self, xml_attrib: dict, request_params: dict):
 
@@ -115,31 +96,24 @@ class ApplyingXMLRules(object):
         else:
             return xml_attrib["mapping"], map_val
 
-
-
-
-
     def _obtain_valid_keyval(self, xml_attrib: dict, request_params: dict):
         """
         convert other third parts requests to what we desired
         """
         if xml_attrib["mapping"] in request_params.keys():
-                
-            if xml_attrib["type"] == "list": 
+
+            if xml_attrib["type"] == "list":
                 return self._obtain_valid_keyval_from_list(xml_attrib, request_params)
-            
-            else: # primary types
+
+            else:  # primary types
                 return self._obtain_valid_keyval_primary_types(xml_attrib, request_params)
 
         # no key in request to mapping
         return None, None
 
-
-
-
     def _obtain_valid_keyval_from_dict(self, xmlnode, request_params: dict):
 
-        for sub in xmlnode: # check sql injection
+        for sub in xmlnode:  # check sql injection
             xml_attrib = sub.attrib
 
             key, val = self._obtain_valid_keyval(xml_attrib, request_params)
@@ -147,9 +121,6 @@ class ApplyingXMLRules(object):
             # update request parameters
             if key is not None:
                 request_params[key] = val
-
-
-
 
     def convert(self, request_params):
         """
@@ -165,7 +136,6 @@ class ApplyingXMLRules(object):
             see the main function for more details.
         """
 
-
         final_result = {}
 
         for xmlnode in self.xmlroot:
@@ -175,41 +145,38 @@ class ApplyingXMLRules(object):
             if xml_attrib["type"] == "value":
                 key, val = self._obtain_valid_keyval(xml_attrib, request_params)
                 if key is not None:
-                    final_result = DictExtern.union(final_result, proc.get_strval_from_param(xml_attrib, key, val))
+                    final_result = DictExtern.union(final_result, ParametersProcessor.get_strval_from_param(xml_attrib, key, val))
 
             elif xml_attrib["type"] == "number":
                 key, val = self._obtain_valid_keyval(xml_attrib, request_params)
                 if key is not None:
-                    final_result = DictExtern.union(final_result, proc.get_numval_from_param(xml_attrib, key, val))
+                    final_result = DictExtern.union(final_result, ParametersProcessor.get_numval_from_param(xml_attrib, key, val))
 
             elif xml_attrib["type"] == "float":
                 key, val = self._obtain_valid_keyval(xml_attrib, request_params)
                 if key is not None:
-                    final_result = DictExtern.union(final_result, proc.get_floatval_from_param(xml_attrib, key, val))
+                    final_result = DictExtern.union(final_result, ParametersProcessor.get_floatval_from_param(xml_attrib, key, val))
 
             elif xml_attrib["type"] == "boolean":
                 key, val = self._obtain_valid_keyval(xml_attrib, request_params)
                 if key is not None:
-                    final_result = DictExtern.union(final_result, proc.get_boolval_from_param(xml_attrib, key, val))
+                    final_result = DictExtern.union(final_result, ParametersProcessor.get_boolval_from_param(xml_attrib, key, val))
 
             elif xml_attrib["type"] == "list":
                 key, val = self._obtain_valid_keyval(xml_attrib, request_params)
                 if key is not None:
-                    final_result = DictExtern.union(final_result, proc.get_listval_from_param(xml_attrib, key, val))
+                    final_result = DictExtern.union(final_result, ParametersProcessor.get_listval_from_param(xml_attrib, key, val))
 
             elif xml_attrib["type"] == "dictionary":
                 self._obtain_valid_keyval_from_dict(xmlnode, request_params)
-                final_result = DictExtern.union(final_result, proc.get_dictval_from_param(xmlnode, request_params))
+                final_result = DictExtern.union(final_result, ParametersProcessor.get_dictval_from_param(xmlnode, request_params))
 
         return final_result
 
 
-
-
 if __name__ == "__main__":
-
-    roughly = {"wkey1":"thus", "wkey2":"", "wkey3":"None", "wkey4":"", "wkey5":"INSERT", 
-        "wkey6":"110", "wkey7":"1234|57|214.14|test|测试数据||", "wkey8":"None"}
+    roughly = {"wkey1": "thus", "wkey2": "", "wkey3": "None", "wkey4": "", "wkey5": "INSERT",
+               "wkey6": "110", "wkey7": "1234|57|214.14|test|测试数据||", "wkey8": "None"}
 
     """ parsing rule looks like:
         <config>

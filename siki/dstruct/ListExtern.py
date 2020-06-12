@@ -6,7 +6,7 @@
 
 def intersection(set_a: list, set_b: list):
     """
-    intersection of two lists with basic datatype
+    intersection of two lists with basic data type
     """
     set_c = []
     for item in set_a:
@@ -17,7 +17,7 @@ def intersection(set_a: list, set_b: list):
 
 def union(set_a: list, set_b: list):
     """
-    union of two lists with basic datatype
+    union of two lists with basic data type
     """
     set_c = []
     set_c.extend(set_a)
