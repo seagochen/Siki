@@ -276,7 +276,7 @@ def search_folders(folder_path: str) -> list:
     return dir_list
 
 
-def root_leaf(path: str) -> tuple[str, str]:
+def root_leaf(path: str):
     """
     return root, leaf
     """
