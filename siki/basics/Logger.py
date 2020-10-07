@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 # Author: Orlando Chen
 # Create: May 31, 2018
-# Modifi: Mar 18, 2018
+# Modified: Oct 07, 2020
 
 from enum import Enum
 
-from siki.basics import FileUtils as fileutil
-from siki.basics import SystemUtils as sysutil
-from siki.basics import Convert as convert
-from siki.basics import TimeTicker as timetick
-from siki.basics import Hashcode as hashcode
+from siki.basics import FileUtils
+from siki.basics import SystemUtils
+from siki.basics import Convert
+from siki.basics import TimeTicker
+from siki.basics import Hashcode
 from siki.basics.Exceptions import NullPointerException, InvalidParamException
 
 
@@ -20,126 +20,124 @@ class Priority(Enum):
     ERROR = 3
 
 
+def _compute_base64(data: bytes):
+    import base64
+
+    # To be extra safe in python 3, encode text conditionally before concatenating with pad.
+    if isinstance(data, str):
+        data = data.encode('utf-8')
+
+    if not isinstance(data, bytes):
+        raise InvalidParamException("The parameter is neither a string nor byte array type")
+
+    r = base64.b64encode(data)
+    return Convert.binary_to_string(r)
+
+
+def _priority_name(priority):
+    if type(priority) is not Priority:
+        raise InvalidParamException("'priority' must be an instance of Priority")
+    if priority == Priority.INFO:
+        return "INFO"
+    elif priority == Priority.DEBUG:
+        return "DEBUG"
+    elif priority == Priority.WARNING:
+        return "WARNING"
+    elif priority == Priority.ERROR:
+        return "ERROR"
+    else:
+        return "UNKNOWN"
+
+
+def _gen_logfile(directory, file):
+    import datetime
+    timestamp = datetime.datetime.now().strftime("%Y%m%d")
+
+    return FileUtils.gen_file_path(directory, file, "log", timestamp)
+
+
+def _check_valid_file(directory, file):
+    if directory is None or file is None:
+        raise NullPointerException("Invalid operation, call init first")
+
+    return _gen_logfile(directory, file)
+
+
 class Logger(object):
 
-
-    def __init__(self, b_stdout = True, b_log = False, dir = None, file = None):
+    def __init__(self, b_stdout=True, b_log=False, directory=None, file=None):
         self.m_bStdOut = b_stdout
         self.m_bUseLog = b_log
         if self.m_bUseLog:
-            fileutil.mkdir(dir)
+            FileUtils.mkdir(directory)
             self.m_file = file
-            self.m_dir  = dir
-
-    def _gen_logfile(self, dir, file):
-        import datetime
-        timestamp = datetime.datetime.now().strftime("%Y%m%d")
-        
-        #return fileutil.gen_path(dir, file, "log", timestamp)
-        return fileutil.gen_file_path(dir, file, "log", timestamp)
-
-
-    def _check_valid_file(self, dir, file):
-        if dir is None or file is None:
-            raise NullPointerException("Invalid operation, call init first")
-        
-        return self._gen_logfile(dir, file)
-
-
-    def _priority_name(self, priority):
-        if type(priority) is not Priority:
-            raise InvalidParamException("'priority' must be an instance of Priority")
-        if priority == Priority.INFO:
-            return "INFO"
-        elif priority == Priority.DEBUG:
-            return "DEBUG"
-        elif priority == Priority.WARNING:
-            return "WARNING"
-        elif priority == Priority.ERROR:
-            return "ERROR"
-        else:
-            return "UNKNOWN"
-
+            self.m_dir = directory
 
     def file_path(self):
-        return self._check_valid_file(self.m_dir, self.m_file)
+        return _check_valid_file(self.m_dir, self.m_file)
 
-
-    def message(self, priority, title = None, msg = None, exception = None):
+    def message(self, priority, title=None, msg=None, exception=None):
         import traceback
 
         # check log is validate
         if self.m_bUseLog:
-            f = self._check_valid_file(self.m_dir, self.m_file)
+            self.m_file = _check_valid_file(self.m_dir, self.m_file)
 
-        errline = "{0} <{1}>".format(timetick.debug_msg_with_timestamp(), self._priority_name(priority))
-        
+        error_line = "{0} <{1}>".format(TimeTicker.debug_msg_with_timestamp(), _priority_name(priority))
+
         if title is not None:
-            errline += "\t[{0}]".format(title)
-    
-        if msg is not None:
-            errline += "\t{0}".format(msg)
+            error_line += "\t[{0}]".format(title)
 
-        if sysutil.is_windows():
-            errline += "\r\n"
+        if msg is not None:
+            error_line += "\t{0}".format(msg)
+
+        if SystemUtils.is_windows():
+            error_line += "\r\n"
         else:
-            errline += "\n"
+            error_line += "\n"
 
         if exception is not None:
-            error = ''.join(traceback.format_exception(etype=type(exception), value=exception, tb=exception.__traceback__))
-            errline += "{0}".format(error)
-    
+            error = ''.join(
+                traceback.format_exception(etype=type(exception), value=exception, tb=exception.__traceback__))
+            error_line += "{0}".format(error)
+
         if self.m_bUseLog:
-            fileutil.write_file(f, convert.string_to_binary(errline), True)
-        
+            FileUtils.write_file(self.m_file, Convert.string_to_binary(error_line), True)
+
         if self.m_bStdOut:
-            print(errline)
-
-
-    def _compute_base64(self, data: bytes):
-        import base64
-        
-        # To be extra safe in python 3, encode text conditionally before concatenating with pad.
-        if not isinstance(data, bytes):
-            data = data.encode('utf-8')
-
-        r = base64.b64encode(data)
-        return convert.binary_to_string(r)
-
+            print(error_line)
 
     def data_in_base64(self, priority, title: str, data: bytes):
         # check log is validate
-        f = self._check_valid_file(self.m_dir, self.m_file)
-        line = "{0} <{1}> [{2}]".format(timetick.debug_msg_with_timestamp(), self._priority_name(priority), title)
+        f = _check_valid_file(self.m_dir, self.m_file)
+        line = "{0} <{1}> [{2}]".format(TimeTicker.debug_msg_with_timestamp(), _priority_name(priority), title)
 
-        if sysutil.is_windows():
-            line += "\r\n    Data: {0}\r\n".format(self._compute_base64(data))
+        if SystemUtils.is_windows():
+            line += "\r\n    Data: {0}\r\n".format(_compute_base64(data))
         else:
-            line += "\n    Data: {0}\n".format(self._compute_base64(data))
+            line += "\n    Data: {0}\n".format(_compute_base64(data))
 
         if self.m_bUseLog:
-            fileutil.write_file(f, convert.string_to_binary(line), True)
-        
+            FileUtils.write_file(f, Convert.string_to_binary(line), True)
+
         if self.m_bStdOut:
             print(line)
-
 
     def data_in_hashcode(self, priority, title: str, data: bytes):
         # check log is validate
-        f = self._check_valid_file(self.m_dir, self.m_file)
-        line = "{0} <{1}> [{2}]".format(timetick.debug_msg_with_timestamp(), self._priority_name(priority), title)
+        f = _check_valid_file(self.m_dir, self.m_file)
+        line = "{0} <{1}> [{2}]".format(TimeTicker.debug_msg_with_timestamp(), _priority_name(priority), title)
 
-        if sysutil.is_windows():
-            line += "\r\n    Data: {0}\r\n".format(hashcode.md5(data))
+        if SystemUtils.is_windows():
+            line += "\r\n    Data: {0}\r\n".format(Hashcode.md5(data))
         else:
-            line += "\n    Data: {0}\n".format(hashcode.md5(data))
+            line += "\n    Data: {0}\n".format(Hashcode.md5(data))
 
         if self.m_bUseLog:
-            fileutil.write_file(f, convert.string_to_binary(line), True)
-        
+            FileUtils.write_file(f, Convert.string_to_binary(line), True)
+
         if self.m_bStdOut:
             print(line)
-
 
 
 if __name__ == "__main__":
@@ -151,8 +149,8 @@ if __name__ == "__main__":
         log.message(Priority.INFO, "title", "check message", e)
 
     print(log.file_path())
-    
-    raw = fileutil.read_file("callback.py")
+
+    raw = FileUtils.read_file("callback.py")
     log.data_in_base64(Priority.INFO, "data", raw)
-    
+
     log.data_in_hashcode(Priority.ERROR, "hashcode", raw)

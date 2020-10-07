@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Author: Orlando Chen
 # Create: May 31, 2018
-# Modified: Jun 11, 2020
+# Modified: Oct 07, 2020
 
 import ntpath
 import re
@@ -11,14 +11,21 @@ from siki.basics import Convert
 from siki.basics.Exceptions import NoAvailableResourcesFoundException
 from siki.basics.Exceptions import InvalidParamException
 
+from collections.abc import Callable
 
-def gen_folder_path(prev: str, *last: list):
+
+def gen_folder_path(prev: str, *last):
     """
     Generate a folder path
     """
     directory = prev
-    for strL in last:
-        directory = os.path.join(directory, strL)
+    for token in last:
+
+        if not isinstance(token, str):
+            token = str(token)
+
+        directory = os.path.join(directory, token)
+
     return directory
 
 
@@ -30,21 +37,20 @@ def gen_file_path(folder: str, filename: str, suffix: str = None, addition: str 
     return os.path.abspath(directory)
 
 
-def gen_filename(filename: str, suffix: str = None, addition: str = None):
+def gen_filename(*tokens):
     """
     Generate a file name with extension
     """
-    if suffix is None and addition is not None:
-        return filename + "." + addition
-    if suffix is None and addition is None:
-        return filename
-    if suffix is not None and addition is None:
-        return filename + "." + suffix
+    final_token = []
 
-    return filename + "." + addition + "." + suffix
+    for t in tokens:
+        if t is not None:
+            final_token.append(t)
+
+    return ".".join(final_token)
 
 
-def read_file(file_path: str, read_size: int = 4096, callback: object = None):
+def read_file(file_path: str):
     """
     Read all the data of a given file at once
     """
@@ -53,13 +59,22 @@ def read_file(file_path: str, read_size: int = 4096, callback: object = None):
         if not f.readable():
             raise NoAvailableResourcesFoundException("Cannot load file itself")
 
-        if callback is not None:
+        return f.read()
+
+
+def read_file_with_callable(function: Callable[[bytes], None], file_path: str, read_size: int = 4096):
+    """
+    Read all the data of a given file at once
+    """
+    with open(file=file_path, mode="rb") as f:
+
+        if not f.readable():
+            raise NoAvailableResourcesFoundException("Cannot load file itself")
+
+        data = f.read(read_size)
+        while data is not None and len(data) > 0:
+            function(data)
             data = f.read(read_size)
-            while data is not None and len(data) > 0:
-                callback(data)
-                data = f.read(read_size)
-        else:
-            return f.read()
 
 
 def read_file_by_line(file_path: str):
@@ -204,6 +219,13 @@ def copy(path1: str, path2: str):
         copy2(path1, path2)
     if exists(path1) and isdir(path1):
         copytree(path1, path2)
+
+
+def pwd():
+    """
+    Get current working directory
+    """
+    return os.getcwd()
 
 
 def search_list(path: str, is_folder=False, pattern: str = "*") -> list:
