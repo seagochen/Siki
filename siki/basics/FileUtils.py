@@ -11,8 +11,6 @@ from siki.basics import Convert
 from siki.basics.Exceptions import NoAvailableResourcesFoundException
 from siki.basics.Exceptions import InvalidParamException
 
-from collections.abc import Callable
-
 
 def gen_folder_path(prev: str, *last):
     """
@@ -62,10 +60,13 @@ def read_file(file_path: str):
         return f.read()
 
 
-def read_file_with_callable(function: Callable[[bytes], None], file_path: str, read_size: int = 4096):
+def read_file_with_callback(function, file_path: str, read_size: int = 4096):
     """
     Read all the data of a given file at once
     """
+    if function is None:
+        raise InvalidParamException("Cannot use callback funtion")
+
     with open(file=file_path, mode="rb") as f:
 
         if not f.readable():
