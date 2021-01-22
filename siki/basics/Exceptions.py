@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Author: Orlando Chen
 # Create: 15 Aug, 2017
-# Modifi: 13 Sep, 2018
+# Modified: 13 Sep, 2018
 
 class ArrayIndexOutOfBoundsException(Exception):
     def __init__(self, message):

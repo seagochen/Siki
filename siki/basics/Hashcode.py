@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Author: Orlando Chen
 # Create: May 31, 2018
-# Modifi: Mar 17, 2020
+# Modified: Mar 17, 2020
 
 import hashlib
 

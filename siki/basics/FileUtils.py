@@ -53,7 +53,6 @@ def read_file(file_path: str):
     Read all the data of a given file at once
     """
     with open(file=file_path, mode="rb") as f:
-
         if not f.readable():
             raise NoAvailableResourcesFoundException("Cannot load file itself")
 
@@ -220,6 +219,10 @@ def copy(path1: str, path2: str):
         copy2(path1, path2)
     if exists(path1) and isdir(path1):
         copytree(path1, path2)
+
+
+def file_size(file: str):
+    return os.path.getsize(file)
 
 
 def pwd():

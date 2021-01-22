@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 # Author: Orlando Chen
 # Create: Mar 21, 2017
-# Modifi: Sep 12, 2018
+# Modified: Jan 22, 2021
 
 import re
+
 
 def check_email(email):
     """
@@ -90,14 +91,14 @@ def check_datetime(datetime):
     """
     combination of date and time, from 1900-01-01 00:00:00 to 2099-12-31 23:59:59
     """
-    pattern = r"^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01]) (2[0-3]|[01]?[0-9]):([0-5]?[0-9]):([0-5]?[0-9])$"
+    pattern = r"^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01]) " \
+              r"(2[0-3]|[01]?[0-9]):([0-5]?[0-9]):([0-5]?[0-9])$"
     return re.match(pattern, datetime) is not None
-    
-    
+
+
 def check_ipv4(ip):
     """
     check the format of IPv4
     """
     pattern = r"^((?:(?:25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d)))\.){3}(?:25[0-5]|2[0-4]\d|((1\d{2})|([1-9]?\d))))$"
     return re.match(pattern, ip) is not None
-   

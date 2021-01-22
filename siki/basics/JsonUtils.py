@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 # Author: Orlando Chen
 # Create: May 09, 2018
-# Modifi: Apr 21, 2020
+# Modified: Apr 21, 2021
 
 # Import system standard modules
 import json
 
 from siki.basics import FileUtils as fileutil
 from siki.basics import Convert as convert
+
 
 def decode_json(string: str):
     """
@@ -18,7 +19,7 @@ def decode_json(string: str):
 
     @Returns:  
     * [dict] if load success. None, failed, empty data
-    """    
+    """
     if string:
         try:
             return json.loads(string)
@@ -47,11 +48,11 @@ def encode_json(data: object):
         except Exception as e:
             print(e)
             return None
-    
+
     return None
 
 
-def load_json_file(filename):
+def load_json_file(filename: str):
     """
     Create a blank file or load data from json file
 
@@ -69,7 +70,7 @@ def load_json_file(filename):
         return {}
 
 
-def write_json_file(dictionary, filename):
+def write_json_file(dictionary: dict, filename: str):
     """
     Write dictionary to json file
     

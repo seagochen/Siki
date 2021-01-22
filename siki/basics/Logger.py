@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 # Author: Orlando Chen
 # Create: May 31, 2018
-# Modified: Oct 07, 2020
+# Modified: Jan 22, 2021
+
+import platform
 
 from enum import Enum
 
 from siki.basics import FileUtils
-from siki.basics import SystemUtils
 from siki.basics import Convert
 from siki.basics import TimeTicker
 from siki.basics import Hashcode
@@ -83,7 +84,7 @@ class Logger(object):
         if self.m_bUseLog:
             self.m_file = _check_valid_file(self.m_dir, self.m_file)
 
-        error_line = "{0} <{1}>".format(TimeTicker.debug_msg_with_timestamp(), _priority_name(priority))
+        error_line = "{0} <{1}>".format(TimeTicker.time_with_msg(), _priority_name(priority))
 
         if title is not None:
             error_line += "\t[{0}]".format(title)
@@ -91,7 +92,8 @@ class Logger(object):
         if msg is not None:
             error_line += "\t{0}".format(msg)
 
-        if SystemUtils.is_windows():
+        # if SystemUtils.is_windows():
+        if "Windows" in platform.system():
             error_line += "\r\n"
         else:
             error_line += "\n"
@@ -110,9 +112,10 @@ class Logger(object):
     def data_in_base64(self, priority, title: str, data: bytes):
         # check log is validate
         f = _check_valid_file(self.m_dir, self.m_file)
-        line = "{0} <{1}> [{2}]".format(TimeTicker.debug_msg_with_timestamp(), _priority_name(priority), title)
+        line = "{0} <{1}> [{2}]".format(TimeTicker.time_with_msg(), _priority_name(priority), title)
 
-        if SystemUtils.is_windows():
+        # if SystemUtils.is_windows():
+        if "Windows" in platform.system():
             line += "\r\n    Data: {0}\r\n".format(_compute_base64(data))
         else:
             line += "\n    Data: {0}\n".format(_compute_base64(data))
@@ -126,9 +129,10 @@ class Logger(object):
     def data_in_hashcode(self, priority, title: str, data: bytes):
         # check log is validate
         f = _check_valid_file(self.m_dir, self.m_file)
-        line = "{0} <{1}> [{2}]".format(TimeTicker.debug_msg_with_timestamp(), _priority_name(priority), title)
+        line = "{0} <{1}> [{2}]".format(TimeTicker.time_with_msg(), _priority_name(priority), title)
 
-        if SystemUtils.is_windows():
+        # if SystemUtils.is_windows():
+        if "Windows" in platform.system():
             line += "\r\n    Data: {0}\r\n".format(Hashcode.md5(data))
         else:
             line += "\n    Data: {0}\n".format(Hashcode.md5(data))
